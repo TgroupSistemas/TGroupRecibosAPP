@@ -3,13 +3,13 @@ import Link from 'next/link';
 
 
 interface agregarProps {
-    setShowPopupAgregar: (value: boolean) => void;
+    empresa: string;
 }
 export default function EmpresaBoton(props: agregarProps) {
 
 
     return (
-        <Link className="w-full md:w-1/3" href={"/" + "TGROUP"}>
+        <Link className="w-full md:w-1/3" href={"/" + props.empresa}>
         <div className="p-4">
           <div className="flex rounded-lg h-full w-full bg-gray-100 p-8 flex-col">
             <div className="flex items-center mb-3">
@@ -27,7 +27,7 @@ export default function EmpresaBoton(props: agregarProps) {
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
-              <h2 className="text-gray-900 text-lg title-font font-medium">{"TGROUP"}</h2>
+              <h2 className="text-gray-900 text-lg title-font font-medium">{props.empresa}</h2>
             </div>
             <div className="flex-grow">
               <p className="leading-relaxed text-base">

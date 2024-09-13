@@ -2,12 +2,11 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Producto } from "@/app/Modelo";
-import Categoria from "@/components/Categoria";
 import { UpdateTriggerProvider } from "@/app/context"; // Import the UpdateTriggerProvider
 import { useAppContext } from '@/contexts/AppContext';
 
 export default function Home() {
-  const { loginUser, responseLogin, loggedIn, isLoggedIn } = useAppContext();
+  const { loginUser, responseLogin, postLogRecibo, logLoading, loggedIn, isLoggedIn } = useAppContext();
 
   const [dni, setDNI] = useState<string>("");
   const [password, setPassword] = useState('');
@@ -51,6 +50,7 @@ export default function Home() {
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
       <form className="space-y-6" onSubmit={handleSubmit}>
         <div>
+        21949693
           <label htmlFor="dni" className="block text-sm font-medium leading-6 text-gray-900">DNI</label>
           <div className="mt-2 flex">
             <input id="dni" name="dni" type="number" onChange={e => setDNI(e.target.value)}   required className="block  w-full rounded-md border-0 py-1.5 bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"/>
@@ -61,7 +61,7 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Contraseña</label>
             <div className="text-sm">
-             
+            TGROUP;30716526964
             </div>
           </div>
           <div className="mt-2">
@@ -70,7 +70,8 @@ export default function Home() {
         </div>
         <div className="text-red-500">{}</div>
 
-  
+        {error && <span className="text-red-500">{error}</span>}
+
         <div>
           <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Acceder</button>
         </div>

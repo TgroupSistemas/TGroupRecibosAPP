@@ -6,7 +6,6 @@ import {
   useCallback,
 } from "react";
 import axios from "axios";
-import { redirect } from "next/dist/server/api-utils";
 import {
   logeo,
   enviarClase,
@@ -15,7 +14,12 @@ import {
   getRegistroUnico,
   LbGetClases,
   LbRegistroClase,
-  getRecibos
+  getRecibos,
+  updateRecibo,
+  updateCorreo,
+  getTokenAPI,
+  postLog,
+  traerPDF
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
@@ -30,7 +34,6 @@ export const AppContextProvider = ({ children }) => {
   const [loggedIn, setLoggedIn] = useState(true);
   const [clasesHabilitadas, setClasesHabilitadas] = useState([]);
   const [claseLoading, setClaseLoading] = useState(false);
-  const [tareasLoading, setTareasLoading] = useState(true);
   const [registroActual, setRegistroActual] = useState(true);
   const [registroLoading, setRegistroLoading] = useState(true);
   const [endpointLoading, setEndpointLoading] = useState(true);
@@ -45,7 +48,10 @@ export const AppContextProvider = ({ children }) => {
   const [endpointActualPopUp, setEndpointActualPopUp] = useState("");
   const [hasPassw, setHasPassw] = useState(false);
   const [alerts, setAlerts] = useState([]);
-
+  const [PDF, setPDF] = useState("");
+  const [PDFLoading, setPDFLoading] = useState(true);
+  const [recibosFirmaLoading, setRecibosFirmaLoading] = useState(false);
+  const [logLoading, setLogLoading] = useState(false);
   const [filtroEndpointActualFijoPopUp, setFiltroEndpointActualFijoPopUp] =
     useState("");
   const [errorAlert, setErrorAlert] = useState("");
@@ -59,40 +65,42 @@ export const AppContextProvider = ({ children }) => {
     try {
       const data = await logeo(credentials);
       if (data.status == 200) {
+    
         setHasPassw(data.datos.PASSWORD != "" && data.datos.PASSWORD != null ? true : false);
-        setLoggedIn(true);
         setResponseLogin(data);
-        document.cookie = "isloggedin=" + true + "; max-age=3600; path=/";
-        document.cookie = `id=${data.datos.ID}; max-age=3600; path=/`;
-        document.cookie = `hasPassword=${
-          data.datos.PASSWORD != "" && data.datos.PASSWORD != null? true : false
-        }; max-age=3600; path=/`;
+        postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID,);
+        console.log(data);
+        document.cookie = "isloggedin=" + await setCookie("true") + "; max-age=28800; path=/";
+        document.cookie = `id=${await setCookie(data.datos.ID)}; max-age=28800; path=/`;
+        document.cookie = `hasPassword=${await setCookie(data.datos.PASSWORD != "" && data.datos.PASSWORD != null? "true" : "false")}; max-age=28800; path=/`;
         document.cookie =
-          "rs_elecom=" + data.datos.ELECOM_RS + "; max-age=3600; path=/";
+          "rs_elecom=" + await setCookie(data.datos.ELECOM_RS) + "; max-age=28800; path=/";
           document.cookie =
-          "name=" + data.datos.FULLNAME + "; max-age=3600; path=/";
+          "name=" + await setCookie(data.datos.FULLNAME) + "; max-age=28800; path=/";
         document.cookie =
           "fl_erp_empresas=" +
-          data.datos.FK_WS_CLIENTES +
-          "; max-age=3600; path=/";
-        document.cookie =
-          "empresas" +
-          JSON.stringify(data.datos.WS_DET_CLI_EMPRESAS) +
-          "; max-age= ; path=/";
+          await setCookie(data.datos.FK_WS_CLIENTES) +
+          "; max-age=28800; path=/";
         document.cookie =
           "elecom_vendedor=" +
-          data.datos.ELECOM_VENDEDOR +
-          "; max-age=3600; path=/";
+          await setCookie(data.datos.ELECOM_VENDEDOR) +
+          "; max-age=28800; path=/";
         document.cookie =
-          "username=" + data.datos.USERNAME + "; max-age=3600; path=/";
+          "username=" + await setCookie(data.datos.USERNAME) + "; max-age=28800; path=/";
         document.cookie =
           "fk_erp_contactos=" +
-          data.datos.FK_ERP_CONTACTOS +
-          "; max-age=3600; path=/";
+          await setCookie(data.datos.FK_ERP_CONTACTOS) +
+          "; max-age=28800; path=/";
         document.cookie =
           "menu=" +
-          JSON.stringify(data.datos.WS_DET_CLI_MENU) +
-          "; max-age=3600; path=/";
+          await setCookie(JSON.stringify(data.datos.WS_DET_CLI_MENU)) +
+          "; max-age=28800; path=/";
+          document.cookie =
+          "empresasHabilitadas=" +
+          await setCookie(JSON.stringify(data.datos.WS_DET_CLI_EMPRESAS)) +
+          "; max-age=28800; path=/";
+          setLoggedIn(true);
+
         return true;
 
       } else {
@@ -121,79 +129,65 @@ export const AppContextProvider = ({ children }) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   }
   const getUsername = useCallback(async () => {
-    if (getCookie("username") == null) {
+    if (await getCookie("username") == null) {
       return "TGROUP";
     }
     return (
-      formatNumberWithDots(getCookie("username"))
+      formatNumberWithDots(await getCookie("username"))
+    );
+  }, []);
+  const getEmpresasHab = useCallback(async () => {
+    if (await await getCookie("empresasHabilitadas") == null) {
+      return [];
+    }
+    return (
+      await getCookie("empresasHabilitadas")
     );
   }, []);
   const getEmpresaName = useCallback(async () => {
-    if (getCookie("fl_erp_empresas") == null) {
+    if (await await getCookie("fl_erp_empresas") == null) {
       return "TGROUP";
     }
     return (
-      getCookie("fl_erp_empresas").charAt(0).toUpperCase() +
-      getCookie("fl_erp_empresas").slice(1).toLowerCase()
+      await getCookie("fl_erp_empresas").charAt(0).toUpperCase() +
+      await getCookie("fl_erp_empresas").slice(1).toLowerCase()
     );
   }, []);
   const getName = useCallback(async () => {
-    if (getCookie("name") == null) {
+    if (await await getCookie("name") == null) {
       return "TGROUP";
     }
     return (
-      getCookie("name")
+      await getCookie("name")
     );
   }, []);
+  const [correoLoading, setCorreoLoading] = useState("");
+  const [correoError, setCorreoError] = useState("");
 
-  const activarPopUp = useCallback(async (endpoint, pagina, campo) => {
-    if (endpoint && pagina) {
-      setPaginaActualComponente(pagina);
-      setCampoPopUpActual(campo);
-      await getEndpoint(endpoint, pagina, "");
-      setPopUpSelectorActivo(true);
-      setCampoSelectorActivo(campo);
-    }
-  }, []);
+  const ponerMail = useCallback(
+    async (correo) => {
+      setCorreoLoading(true);
+      console.log(correo);
+      const idUser = await getCookie("id");
+      try {
+        const data = await updateCorreo(
+          idUser,
+          correo
+        );
+        if (data == 200) {
+          setCorreoLoading(false);
+        } else {
+          console.log("ERRORRR correo");
+        }
+      } catch (error) {
+        console.error(error);
+        setCorreoLoading(false);
+        correoError("Error al actualizar el correo");
 
-  const siguientePaginaPopUp = useCallback(
-    async (endpoint, pagina, filtro, data) => {
-      if (endpoint) {
-        setPaginaActualComponente(pagina + 1);
-        await getEndpoint(endpoint, pagina + 1, filtro, data);
       }
     },
     []
   );
-
-  const anteriorPaginaPopUp = useCallback(
-    async (endpoint, pagina, filtro, data) => {
-      if (endpoint) {
-        setPaginaActualComponente(pagina > 1 ? pagina - 1 : 1);
-        await getEndpoint(endpoint, pagina > 1 ? pagina - 1 : 1, filtro, data);
-      }
-    },
-    []
-  );
-  //tolis
-  async function enviarFormularioClase(endpoint) {
-    try {
-      const data = await enviarClase(
-        endpoint,
-        getCookie("fl_erp_empresas"),
-        datosFormularioActual
-      );
-
-      if (data.status == 200) {
-        window.location.reload();
-      } else {
-        console.log("ERRORRR enviarClase");
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
   const removeAlert = (index) => {
     const updatedAlerts = [...alerts];
     updatedAlerts.splice(index, 1);
@@ -205,23 +199,23 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
   const getEmpresa = useCallback(async () => {
-    return getCookie("fl_erp_empresas");
+    return await getCookie("fl_erp_empresas");
   }, []);
 
   //tolis
   const changePassword = useCallback(async (credentials) => {
-    const fl_erp_empresas = getCookie("fl_erp_empresas");
-    const id = getCookie("id");
+    const fl_erp_empresas = await getCookie("fl_erp_empresas");
+    const id = await getCookie("id");
 
     try {
       const data = await cambioPassword(
         credentials.password,
         id,
-        getCookie("fl_erp_empresas")
+        await getCookie("fl_erp_empresas")
       );
 
       if (data.status == 200) {
-        document.cookie = `hasPassword=${true}; max-age=3600; path=/`;
+        document.cookie = `hasPassword=${await setCookie("true")}; max-age=28800; path=/`;
         setHasPassw(true);
       } else {
         console.log("ERRORRR cambio password");
@@ -235,27 +229,7 @@ export const AppContextProvider = ({ children }) => {
     setAlerts([...alerts, newAlert]);
 };
 
-  const getRegistroClase = useCallback(async (pagina, parametros, endpoint) => {
-      setTareasLoading(true);
-      try {
-        const data = await LbRegistroClase(
-          pagina, parametros, endpoint, getCookie("fl_erp_empresas")
-        );
-
-        if (data.status == 200) {
-          setTareas(data.datos);
-          setTareasLoading(false);
-
-        } else {
-          console.log("ERRORRR getregistros");
-        }
-      } catch (error) {
-        console.log("ERRORRR getregistros");
-        setTareasLoading(false);
-      }
-    },
-    []
-  );
+  
   function generateSqlFilterParams(parametros, filtro) {
     // Split the parametros string into an array of parameter names
   
@@ -273,35 +247,7 @@ export const AppContextProvider = ({ children }) => {
       return Object.keys(dataActual);
     }
     
-  //tolis
-  const getEndpoint = useCallback(
-    async (endpoint, pagina, filtro = "", dataActual = "") => {
-      const fl_erp_empresas = getCookie("fl_erp_empresas");
-      console.log(generateSqlParams(dataActual));
-      try {
-        const data = await traerEndpoint(
-          filtro,
-          generateSqlParams(dataActual),
-          pagina,
-          getCookie("fl_erp_empresas"),
-          endpoint
-        );
 
-        if (data.status == 200) {
-          setEndpointLoading(false);
-          setEndpointActualPopUp(endpoint);
-          setFiltroEndpointActualFijoPopUp(filtro);
-          setEndpointDataActual(data.datos);
-        } else {
-          console.log("ERRORRR getEndpoint");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    []
-  );
-  6;
   const [recibosLoading, setRecibosLoading] = useState(true);
   const [recibos, setRecibos] = useState("");
   
@@ -309,7 +255,7 @@ export const AppContextProvider = ({ children }) => {
     
     async (empresa) => {
       setRecibosLoading(true);
-      const id = getCookie("id");
+      const id = await getCookie("id");
       console.log(id,empresa);
       try {
         const data = await getRecibos(
@@ -321,7 +267,44 @@ export const AppContextProvider = ({ children }) => {
           setRecibosLoading(false);
           setRecibos(data.datos);
         } else {
-          console.log("ERRORRR getEndpoint");
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
+  function generarHora() {
+    return new Date().toLocaleString('en-CA', { 
+      timeZone: 'America/Argentina/Buenos_Aires', 
+      year: 'numeric', 
+      month: '2-digit', 
+      day: '2-digit', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      second: '2-digit', 
+      hour12: false 
+  }).replace(', ', 'T').replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2')
+  }
+  const updateReciboFirmado = useCallback(
+    
+    async (id, estado, disconformidad, empresa) => {
+      setRecibosFirmaLoading(true);
+      try {
+        const data = await updateRecibo(
+          id,
+          estado,
+          disconformidad,
+          generarHora()
+        );
+        await postLogRecibo(empresa, estado, id, await getCookie("id"));
+
+        if (data == 200) {
+          setRecibosFirmaLoading(false);
+          console.log(data);
+        } else {
+          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -330,16 +313,41 @@ export const AppContextProvider = ({ children }) => {
     []
   );
 
+  const postLogRecibo = useCallback(
+    //L|Login|D|Descarga recibo|F|Firma ok recibo|X|Firma disconforme recibo
+    async (FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_USUARIOS) => {
+      setLogLoading(true);
+      if(FK_WS_USUARIOS=="")
+      {
+        FK_WS_USUARIOS = await getCookie("id");
+      }
+      
+      try {
 
+        const data = await postLog(
+          FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_USUARIOS, generarHora()
+        );
+        if (data == 200) {
+          setLogLoading(false);
+          console.log(data);
+        } else {
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
 
   const getClases = useCallback(async () => {
-    const menu = JSON.parse(getCookie("menu"));
+    const menu = JSON.parse(await getCookie("menu"));
     setClaseLoading(true); // loading
 
     try {
       await LbGetClases(
         //call clase con parametros
-        getCookie("fl_erp_empresas")
+        await getCookie("fl_erp_empresas")
       )
         .then(function (response) {
           if (response.status == 200) {
@@ -364,36 +372,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, []);
 
-  //tolis
-  const getClaseRegistro = useCallback(async (id, endpoint) => {
-    setRegistroLoading(true);
-    const headers = {
-      "content-type": "application/json; charset=utf-8",
-    };
-    try {
-      const data = await getRegistroUnico(
-        id,
-        endpoint,
-        getCookie("fl_erp_empresas")
-      )
-        .then(function (response) {
-          console.log("response", response.datos[0]);
-          if (response.status == 200) {
-            setRegistroActual(response.datos[0]);
-            setRegistroLoading(false);
-          } else {
-            console.log("ERRORRR getRegistroUnico");
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    } catch (error) {
-      console.log("ERRORRR getRegistroUnico");
-    }
-  }, []);
-
-  function getCookie(name) {
+  function getCookie2(name) {
     const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].split("=");
@@ -403,9 +382,54 @@ export const AppContextProvider = ({ children }) => {
     }
     return null;
   }
+  async function setCookie(name) {
+    if (name == null) {
+      name = "";
+    }
+        const response = await fetch("/api/getCookies", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cookie: name, method: "encrypt" }),
+        });
+        const res = await response.json()
+        return res.value;
+      }
+
+  async function getCookie(name) {
+    const cookies = document.cookie.split("; ");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].split("=");
+      console.log(cookie);
+      if (cookie[0] === name && cookie[1] != '') {
+
+        const response = await fetch("/api/getCookies", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ cookie: cookie[1], method: "decrypt" }),
+        });
+        const res = await response.json()
+
+        return await  res.value;
+      }
+      
+    }
+    return null;
+  }
+
+  const fetchPDF = async (id) => {
+    setPDFLoading(true);
+    const token = await getTokenAPI("tgroup");
+    const pdf1 = await traerPDF(token.datos[0].GCS_TOKEN, id)
+    setPDF(pdf1);
+    setPDFLoading(false);
+  };
 
   const isLoggedIn = useCallback(async () => {
-    const isLog = getCookie("isloggedin");
+    const isLog = await getCookie("isloggedin");
     if (isLog != null) {
       setLoggedIn(true);
       return true;
@@ -416,7 +440,7 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
   const itHasPassword = useCallback(async () => {
-    const hasP = getCookie("hasPassword");
+    const hasP = await getCookie("hasPassword");
     if (hasP == "true") {
       return true;
     } else {
@@ -438,7 +462,6 @@ export const AppContextProvider = ({ children }) => {
         user,
         tareas,
         getName,
-        getRegistroClase,
         itHasPassword,
         changePassword,
         logout,
@@ -446,16 +469,13 @@ export const AppContextProvider = ({ children }) => {
         getEmpresa,
         getClases,
         clasesHabilitadas,
-        tareasLoading,
+        updateReciboFirmado,
         registroActual,
-        getClaseRegistro,
         claseLoading,
         registroLoading,
-        getEndpoint,
         endpointLoading,
         endpointDataActual,
         popUpSelectorActivo,
-        activarPopUp,
         setPopUpSelectorActivo,
         campoSelectorActivo,
         activarPopUpFiltro,
@@ -463,22 +483,26 @@ export const AppContextProvider = ({ children }) => {
         setPopUpFiltroActivo,
         datosFormularioActual,
         setDatosFormularioActual,
+        postLogRecibo,
         campoPopUpActual,
-        enviarFormularioClase,
         paginaActualComponente,
         getCookie,
         setEndpointFiltroActual,
         endpointFiltroActual,
+        ponerMail,
+        correoLoading,
         endpointActualPopUp,
-        siguientePaginaPopUp,
-        anteriorPaginaPopUp,
         hasPassw,
         addAlert,
         alerts,
         removeAlert,
+        recibosFirmaLoading,
         getRecibosS,
         recibosLoading,
         recibos,
+        getEmpresasHab,
+        logLoading,
+        fetchPDF,PDF,PDFLoading
       }}
     >
       {children}

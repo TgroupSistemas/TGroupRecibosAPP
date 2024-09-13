@@ -5,7 +5,7 @@ import axios from 'axios';
 
 dotenv.config();
 
-
+const PDF_URL = "https://storage.googleapis.com/storage/v1/b/";
 const URL ="https://webapp.tgroup.com.ar/webapp";
 const KEY="$2a$10$d9IbX8BaND9kDRoI9JKCZu"
 const AUTH = `Bearer Mg.og_Wy4tHM9unKseHLu4F0wz4dDcwMsrZc49XXSOFpFDSO-nu7vbB5tYEBA9o` 
@@ -34,12 +34,13 @@ export async function logeo (credentials) {
         if (empresa && username) {
             let sqlFilter = `USERNAME = '${username}' AND FK_WS_CLIENTES= '${empresa}'`;
 
-            if (passwordIntocada == "") {
+            /*if (passwordIntocada == "") {
                 sqlFilter += ` AND (PASSWORD = '' OR PASSWORD IS NULL)`;
             }
             else{
                 sqlFilter += ` AND PASSWORD = '${pass}'`;
-            }
+            }*/
+
             const resp = await axios.get(
                 `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &&cliente=${empresa}`,
                 config, 
@@ -51,9 +52,29 @@ export async function logeo (credentials) {
             }
             else{
                 respuestaAPI = 200;
-                if((datos[0].PASSWORD === '' || datos[0].PASSWORD === null) && passwordIntocada == '')
-                    {	  
-                    // Redirect to home page
+                if((datos[0].PASSWORD === '' || datos[0].PASSWORD === null) )
+                    {	
+                        if (password.includes(';')) {
+                            const [part1, part2] = password.split(';');
+
+                            let sqlFilter2 = `ID = '${part1}' AND ID_CLIENTE= '${part2}'`;
+                            
+                            const resp2 = await axios.get(
+                                `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2} &&cliente=${empresa}`,
+                                config, 
+                                )
+                            let datos2 = resp2.data;
+                            console.log(datos2);
+
+                            if(datos2.length == 0)
+                                {
+                                    respuestaAPI = 201;
+                                }
+                        }
+                        else
+                        {
+                            respuestaAPI = 401;
+                        }
                 }
                 else{
                     if(datos[0].PASSWORD == pass){
@@ -65,7 +86,6 @@ export async function logeo (credentials) {
                     }
                 }
             }
-            console.log(datos[0]);
             return ({status: respuestaAPI, datos: datos[0]});
         } 
     } catch (error) {
@@ -163,17 +183,61 @@ export async function getRegistroUnico(id, endpoint, empresa) {
         });    }
 
 }
+export async function getTokenAPI(empresa) {
+    if ( empresa) {
 
+        try {
+            const resp = await axios.get(
+                `${URL}/clases/WS_PARAMETROS?cliente=${encodeURIComponent(empresa)}`,
+                config
+            );
+            return ({ status: 200, datos: resp.data });
+
+        } catch (error) {
+            console.error(error);
+            return ({
+                status: error.response ? error.response.status : 500,
+                message: error.response ? error.response.data : error.message
+            });        }
+    } else {
+        return ({
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        });    }
+
+}
+export async function traerPDF(token, id) {
+try {
+    console.log(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`)
+      const response = await fetch(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch PDF");
+      }
+
+      const blob = await response.blob();
+;
+
+      return blob;
+    } catch (error) {
+      console.error("Error fetching PDF:", error);
+    }
+}
 
 export async function getRecibos(id, empresa) {
 
     if (id && empresa) {
         try {
+            console.log(`${URL}/clases/WS_RECIBOS?sqlFilter=FK_WS_USUARIOS='${encodeURIComponent(id)}'&cliente=${encodeURIComponent(empresa)}`);
             const resp = await axios.get(
-                `${URL}/clases/WS_RECIBOS?sqlFilter=FK_WS_USUARIOS='${encodeURIComponent(id)}'&cliente=${encodeURIComponent(empresa)}`,
+                `${URL}/clases/WS_RECIBOS?sqlFilter=FK_WS_USUARIOS='${encodeURIComponent(id)}'&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC`,
                 config
             );
-            console.log(resp.data);
+            console.log("recibo", resp.data);
             return ({ status: 200, datos: resp.data });
 
         } catch (error) {
@@ -259,3 +323,85 @@ function generateSqlFilter(parametros, filtro) {
   
 	return sqlFilter;
   }
+  
+
+export const updateRecibo = async (id, estadoFirma, disconformidad, FECHA_ESTADO_FIRMA) => {
+    const url = `${URL}/clases/WS_RECIBOS/${id}`;
+    const data = {
+        FECHA_ESTADO_FIRMA,   
+        ESTADO_FIRMA: estadoFirma
+    };
+    if (disconformidad !== "") {
+        data.MOTIVO_DISCONFORMIDAD = disconformidad;
+    }
+    console.log(url, data);
+    try {
+        const response = await axios.put(url, data, config);
+        return response.status;
+    } catch (error) {
+        console.error(error);
+        return {
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        };
+    }
+};
+
+export const updateCorreo = async (id, correo) => {
+    const url = `${URL}/clases/WS_USUARIOS/${id}?cliente=TGROUP`;
+    const data = {
+        EMAIL: correo,   
+        EMAIL_VERIFICADO: true
+    };
+
+    console.log(url, data);
+    try {
+        const response = await axios.put(url, data, config);
+        return response.status;
+    } catch (error) {
+        console.error(error);
+        return {
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        };
+    }
+};
+
+
+
+async function getIP() {
+    try {
+      const response = await fetch('/api/getIP');
+      const data = await response.json();
+      return data.ip;
+    } catch (error) {
+      console.error('Error fetching IP address:', error);
+      return null;
+    }
+  }
+
+export const postLog = async (FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_USUARIOS, FECHA_HORA) => {
+    const url = `${URL}/clases/WS_RECIBOS_LOG?cliente=${FK_WS_CLIENTES}`;
+    const IP = await getIP();
+    const data = {
+        FK_WS_CLIENTES,
+        IP,
+        OPERACION,
+        FK_WS_RECIBOS,
+        FECHA_HORA,
+                FK_WS_USUARIOS
+    };
+
+    console.log(url, data);
+    try {
+        const response = await axios.post(url, data, config);
+        return response.status;
+    } catch (error) {
+        console.error(error);
+        return {
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        };
+    }
+};
+

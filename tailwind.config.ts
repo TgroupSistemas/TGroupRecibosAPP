@@ -9,6 +9,9 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      width: {
+        '7/10': '30%',
+      },
       colors: {
         amarillo: '#F5D415', 
         azuloscuro: '#2D3277', 

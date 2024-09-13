@@ -1,19 +1,24 @@
 "use client"
 
 import Navbar from "../components/Navbar";
-import { Producto } from "../app/Modelo";
-import Categoria from "../components/Categoria";
 import { UpdateTriggerProvider } from "../app/context"; // Import the UpdateTriggerProvider
 import EmpresaBoton from "@/components/EmpresaBoton";
-
+import MailPassword from "@/components/MailPassword";
 import { useEffect, useState } from "react";
 import { useAppContext } from '@/contexts/AppContext';
-
+import { json } from "stream/consumers";
+interface Empresa {
+  FEC_ULT_ACT: Date | null;
+  FK_SUE_LEGAJOS: number;
+  FK_WS_CLIENTES: string;
+}
 export default function Home() {
-  const { loginUser, responseLogin, loggedIn, isLoggedIn, itHasPassword, getClases, hasPassw, getUsername, getName} = useAppContext();
+  const { loginUser, responseLogin, loggedIn, isLoggedIn, itHasPassword, getClases, hasPassw, getUsername, getName, getEmpresasHab} = useAppContext();
   const [hasPass, setHasPass] = useState(true );
-  const [user, setUser] = useState("Usuario");
-  const [name, setName] = useState("Usuario");
+  const [user, setUser] = useState("");
+  const [name, setName] = useState("");
+  const [empresa, setEmpresa] = useState<Empresa[]>([]);
+  const [loadingEmpresa , setLoadingEmpresa] = useState(true);
   const fetchname = async () => {
     const username = await getName();
     setName(username);
@@ -22,25 +27,36 @@ export default function Home() {
     const username = await getUsername();
     setUser(username);
   };
-  if(isLoggedIn()){
+  const fetchEmpresas = async () => {
+    setLoadingEmpresa(true);
+    const username = await getEmpresasHab();
+    console.log(username)
+    setEmpresa(JSON.parse(username) as Empresa[]);
+    setLoadingEmpresa(false);
+  };
 
-    
-    fetchUsername();
-    fetchname();
-
-  }
   useEffect(() => {
-    setHasPass(hasPassw)
-
     const checkLoginStatus = async () => {
       try {
+        if(isLoggedIn()){
+
+    
+          fetchUsername();
+          fetchname();
+          fetchEmpresas();
+      
+        }
         const logged = await isLoggedIn();
         const hasPassword = await itHasPassword();
+        setHasPass(hasPassw)
+
         if (logged == false) {
           window.location.replace('/login');
         }
         if(hasPassword == true){
           setHasPass(true)
+          console.log("hasPass", hasPass)
+
         }
       } catch (error) {
         console.error("Failed to check login status:", error);
@@ -58,7 +74,7 @@ export default function Home() {
     };
     
     getClasesForHome()
-  }, [loggedIn, isLoggedIn, hasPassw]);
+  }, [hasPassw]);
   return (
     <UpdateTriggerProvider> 
       
@@ -71,11 +87,18 @@ export default function Home() {
     </div>
     <h3 className="pl-4 text-left mb-5 font-bold">Elegí una empresa</h3>
     <div className="flex flex-wrap -m-4 " >
-     <EmpresaBoton setShowPopupAgregar={() => {}}></EmpresaBoton>
+
+    {!loadingEmpresa && empresa.map((item, index) => (
+      console.log("a",empresa),
+        <EmpresaBoton
+          key={index}
+          empresa={item.FK_WS_CLIENTES}
+        />
+      ))}
     </div>
   </div>
 </section>
-      
+  {!hasPass && <MailPassword />}
     </UpdateTriggerProvider>
   );
 }
