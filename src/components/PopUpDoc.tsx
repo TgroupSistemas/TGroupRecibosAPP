@@ -43,6 +43,7 @@ const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) 
   const tipoLiquidacion = getTipoLiquidacion(reciboRecibido.TIP_LIQ);
   const [popUpFirmaOpen, setPopUpFirmaOpen] = useState(false);
   const [estadoFirma, setEstadoFirma] = useState(1);
+  console.log(reciboRecibido);
   return (
 <div
       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity   duration-500`}
@@ -57,14 +58,10 @@ const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) 
           }</p> 
         {reciboRecibido.ESTADO_FIRMA === "X" || reciboRecibido.ESTADO_FIRMA === "F" ? (
         <p><span className='font-bold '>Fecha de firma: </span>{
-          new Intl.DateTimeFormat('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: 'numeric',
-            minute: 'numeric',
-          }).format(new Date(reciboRecibido.FECHA_ESTADO_FIRMA))
-        }</p> ) : null}
+          
+          (() => { const date = new Date(reciboRecibido.FECHA_ESTADO_FIRMA); const months = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]; return `${date.getUTCDate()} de ${months[date.getUTCMonth()]} de ${date.getUTCFullYear()}, ${date.getUTCHours()}:${date.getUTCMinutes().toString().padStart(2, '0')}`; })()
+
+}</p> ) : null}
         {reciboRecibido.ESTADO_FIRMA === "X" && (
           <p><span className='font-bold'>Motivo de disconformidad: </span>{reciboRecibido.MOTIVO_DISCONFORMIDAD}</p>
         )}                <div className="flex justify-betwee w-full mt-3">

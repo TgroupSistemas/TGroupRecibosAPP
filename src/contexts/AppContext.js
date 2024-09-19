@@ -248,24 +248,26 @@ export const AppContextProvider = ({ children }) => {
     }
     
 
-  const [recibosLoading, setRecibosLoading] = useState(true);
-  const [recibos, setRecibos] = useState("");
+  const [recibosSinFirmarLoading, setRecibosSinFirmarLoading] = useState(true);
+  const [recibosSinFirmar, setRecibosSinFirmar] = useState("");
   
-  const getRecibosS = useCallback(
+  const getRecibosSinFirmar = useCallback(
     
     async (empresa) => {
-      setRecibosLoading(true);
+      setRecibosSinFirmarLoading(true);
       const id = await getCookie("id");
-      console.log(id,empresa);
       try {
         const data = await getRecibos(
           id,
-          empresa
+          empresa,
+          false,
+          1
         );
 
         if (data.status == 200) {
-          setRecibosLoading(false);
-          setRecibos(data.datos);
+          console.log("algo",data.datos);
+          setRecibosSinFirmarLoading(false);
+          setRecibosSinFirmar(data.datos);
         } else {
           console.log("ERRORRR recibos");
         }
@@ -275,6 +277,39 @@ export const AppContextProvider = ({ children }) => {
     },
     []
   );
+  const [recibosFirmadosLoading, setRecibosFirmadosLoading] = useState(true);
+  const [recibosFirmados, setRecibosFirmados] = useState([]);
+  const getRecibosFirmados = useCallback(
+    async (empresa) => {
+      setRecibosFirmadosLoading(true);
+      const id = await getCookie("id");
+      let page = recibosFirmados.length + 1; // Use the current length as the page number
+      if(recibosFirmados.length == 0)
+      {
+        page = 1;
+      }
+      try {
+        const data = await getRecibos(id, empresa, true, page);
+  
+        if (data.status === 200) {
+          setRecibosFirmados(prevState => {
+            const newState = [...prevState];
+            newState[page-1] = data.datos;
+            return newState;
+          });
+          setRecibosFirmadosLoading(false);
+        } else {
+          console.log("ERRORRR recibos");
+          setRecibosFirmadosLoading(false);
+        }
+      } catch (error) {
+        console.error(error);
+        setRecibosFirmadosLoading(false);
+      }
+    },
+    [recibosFirmados.length]
+  );
+
   function generarHora() {
     return new Date().toLocaleString('en-CA', { 
       timeZone: 'America/Argentina/Buenos_Aires', 
@@ -497,11 +532,14 @@ export const AppContextProvider = ({ children }) => {
         alerts,
         removeAlert,
         recibosFirmaLoading,
-        getRecibosS,
-        recibosLoading,
-        recibos,
         getEmpresasHab,
         logLoading,
+        getRecibosSinFirmar,
+        recibosSinFirmarLoading,
+        recibosSinFirmar,
+        getRecibosFirmados,
+        recibosFirmadosLoading,
+        recibosFirmados,
         fetchPDF,PDF,PDFLoading
       }}
     >

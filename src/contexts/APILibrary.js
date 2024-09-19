@@ -228,13 +228,13 @@ try {
     }
 }
 
-export async function getRecibos(id, empresa) {
-
+export async function getRecibos(id, empresa, firmados, page) {
+    const sqlFilter = `FK_WS_USUARIOS='${encodeURIComponent(id)}'` + 
+    (firmados ? " AND (ESTADO_FIRMA = 'X' OR ESTADO_FIRMA = 'F')" : " AND (ESTADO_FIRMA != 'X' AND ESTADO_FIRMA != 'F')");
     if (id && empresa) {
         try {
-            console.log(`${URL}/clases/WS_RECIBOS?sqlFilter=FK_WS_USUARIOS='${encodeURIComponent(id)}'&cliente=${encodeURIComponent(empresa)}`);
             const resp = await axios.get(
-                `${URL}/clases/WS_RECIBOS?sqlFilter=FK_WS_USUARIOS='${encodeURIComponent(id)}'&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC`,
+                `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC&page=${page}`,
                 config
             );
             console.log("recibo", resp.data);

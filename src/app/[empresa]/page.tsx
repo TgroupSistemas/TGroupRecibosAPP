@@ -61,9 +61,13 @@ export default function Home() {
     hasPassw,
     getUsername,
     getName,
-    getRecibosS,
     recibosLoading,
-    recibos,
+    recibosSinFirmar,
+    recibosFirmados,
+    getRecibosFirmados,
+    getRecibosSinFirmar,
+    recibosFirmadosLoading,
+    recibosSinFirmarLoading,
   } = useAppContext();
 
   const [user, setUser] = useState("...");
@@ -79,22 +83,24 @@ export default function Home() {
     const fetchData = async () => {
       if (typeof window !== "undefined") {
         const empresa = window.location.pathname.substring(1);
-        setEmpresa(window.location.pathname.substring(1))
+        setEmpresa(window.location.pathname.substring(1));
         fetchname();
-        fetchRecibos(empresa);
+        fetchRecibosSinFirmar(empresa);
+        fetchRecibosFirmados(empresa);
+
         fetchEmpresas(empresa);
         fetchUsername();
         const hasPassword = await itHasPassword();
-        if(hasPassword == false){
-          window.location.replace('/');
+        if (hasPassword == false) {
+          window.location.replace("/");
         }
         console.log("v", empresa);
       }
-      if(!loggedIn){
-        window.location.replace('/login');
+      if (!loggedIn) {
+        window.location.replace("/login");
       }
     };
-  
+
     fetchData();
   }, []);
 
@@ -117,9 +123,12 @@ export default function Home() {
       username2.find((e) => e.FK_WS_CLIENTES == empresaSt)?.FK_SUE_LEGAJOS || 0
     );
   };
-  const fetchRecibos = async (empresa: string) => {
-    getRecibosS(empresa);
-    console.log(empresas, empresa);
+  const fetchRecibosFirmados = async (empresa: string) => {
+    getRecibosFirmados(empresa);
+    console.log(empresas);
+  };
+  const fetchRecibosSinFirmar = async (empresa: string) => {
+    getRecibosSinFirmar(empresa);
   };
 
   return (
@@ -141,9 +150,8 @@ export default function Home() {
           </div>
 
           <div className="space-y-4">
-            {!recibosLoading ? (
-              recibos.filter((recibo: Recibo) => recibo.ESTADO_FIRMA !== "X" && recibo.ESTADO_FIRMA !== "F")
-                .length > 0 ? (
+            {!recibosSinFirmarLoading ? (
+              recibosSinFirmar.length > 0 ? (
                 <>
                   <div className="flex items-center my-4">
                     <div className="flex-grow border-t border-gray-300"></div>
@@ -152,18 +160,16 @@ export default function Home() {
                     </span>
                     <div className="flex-grow border-t border-gray-300"></div>
                   </div>
-                  
-                      <ReciboCard
-                        key={4324}
-                        recibo={ recibos.filter((recibo: Recibo) => recibo.ESTADO_FIRMA !== "X" && recibo.ESTADO_FIRMA !== "F")[0]}
-                        set={setActualRecibo}
-                        set2={setPopUpOpen}
-                        index={4324}
-                        habilitada={true}
-                        empresa={window.location.pathname.substring(1)}
 
-                      />
-
+                  <ReciboCard
+                    key={4324}
+                    recibo={recibosSinFirmar[0]}
+                    set={setActualRecibo}
+                    set2={setPopUpOpen}
+                    index={4324}
+                    habilitada={true}
+                    empresa={window.location.pathname.substring(1)}
+                  />
                 </>
               ) : (
                 <div className="text-center font-bold text-green-500">
@@ -175,9 +181,8 @@ export default function Home() {
                 <span className="loading loading-infinity loading-lg"></span>
               </div>
             )}
-            {!recibosLoading ? (
-              recibos.filter((recibo: Recibo) => recibo.ESTADO_FIRMA !== "F" && recibo.ESTADO_FIRMA !== "X")
-                .length > 1 ? (
+            {!recibosSinFirmarLoading ? (
+              recibosSinFirmar.length > 1 ? (
                 <>
                   <div className="flex items-center my-4">
                     <div className="flex-grow border-t border-gray-300"></div>
@@ -186,8 +191,8 @@ export default function Home() {
                     </span>
                     <div className="flex-grow border-t border-gray-300"></div>
                   </div>
-                  {recibos
-                    .filter((recibo: Recibo) => recibo.ESTADO_FIRMA !== "X").slice(1)
+                  {recibosSinFirmar
+                    .slice(1)
                     .map((recibo: Recibo, index: number) => (
                       <ReciboCard
                         key={index}
@@ -197,7 +202,6 @@ export default function Home() {
                         index={index}
                         habilitada={false}
                         empresa={window.location.pathname.substring(1)}
-
                       />
                     ))}
                 </>
@@ -218,12 +222,11 @@ export default function Home() {
             ) : (
               <div></div>
             )}
-            {!recibosLoading ? (
-              recibos.filter((recibo: Recibo) => recibo.ESTADO_FIRMA === "X" || recibo.ESTADO_FIRMA === "F")
-                .length > 0 ? (
+            {!recibosFirmadosLoading ? (
+              recibosFirmados.length > 0 ? (
                 <>
-                  {recibos
-                    .filter((recibo: Recibo) => recibo.ESTADO_FIRMA === "X" || recibo.ESTADO_FIRMA === "F")
+                  {recibosFirmados
+                    .flat()
                     .map((recibo: Recibo, index: number) => (
                       <ReciboCard
                         key={index}
@@ -233,7 +236,6 @@ export default function Home() {
                         index={index}
                         habilitada={true}
                         empresa={window.location.pathname.substring(1)}
-
                       />
                     ))}
                 </>
@@ -246,7 +248,12 @@ export default function Home() {
               <div></div>
             )}
           </div>
-
+          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (console.log("WAWAW",recibosFirmados),
+            <div className="flex justify-center">
+            <button className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200" onClick={()=> fetchRecibosFirmados(window.location.pathname.substring(1))}>
+              Ver más recibos
+            </button>
+          </div>)}
         </div>
       </section>
       {popUpOpen && (
@@ -259,6 +266,3 @@ export default function Home() {
     </UpdateTriggerProvider>
   );
 }
-/*          <div className="flex justify-center">
-          <button className="w-40 py-2 bg-gray-300 rounded-lg mt-5 text-3xl text-green-800 font-bold">+</button>
-          </div>*/
