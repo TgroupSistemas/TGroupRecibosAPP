@@ -73,6 +73,7 @@ export const AppContextProvider = ({ children }) => {
         setHasPassw(data.datos.PASSWORD != "" && data.datos.PASSWORD != null ? true : false);
         setResponseLogin(data);
         postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID,);
+        console.log(data);
         document.cookie = "isloggedin=" + await setCookie("true") + "; max-age=28800; path=/";
         document.cookie = `id=${await setCookie(data.datos.ID)}; max-age=28800; path=/`;
         document.cookie = `hasPassword=${await setCookie(data.datos.PASSWORD != "" && data.datos.PASSWORD != null? "true" : "false")}; max-age=28800; path=/`;
@@ -94,8 +95,9 @@ export const AppContextProvider = ({ children }) => {
           "mail=" + await setCookie(data.datos.EMAIL) + "; max-age=28800; path=/";
         document.cookie =
           "mailverificado=" + await setCookie(data.datos.EMAIL_VERIFICADO.toString()) + "; max-age=28800; path=/";
+          const tycValue = data.datos.ACEPTA_TYC != null ? data.datos.ACEPTA_TYC.toString() : "false"; // Default to "false" if null or undefined
           document.cookie =
-          "tyc=" + await setCookie(data.datos.ACEPTA_TYC.toString()) + "; max-age=28800; path=/"; 
+          "tyc=" + await setCookie(tycValue) + "; max-age=28800; path=/"; 
         document.cookie =
           "fk_erp_contactos=" +
           await setCookie(data.datos.FK_ERP_CONTACTOS) +
@@ -116,6 +118,7 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
+      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -192,9 +195,11 @@ export const AppContextProvider = ({ children }) => {
         setMailVerificadoCambio(true);
           setCorreoLoading(false);
         } else {
+          console.log("ERRORRR correo");
         }
       } catch (error) {
         console.error(error);
+        console.log("HOLAAAAA")
         
         setCorreoLoading(false);
         correoError("Error al actualizar el correo");
@@ -227,7 +232,7 @@ export const AppContextProvider = ({ children }) => {
       if (data.status == 200) {
         const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
 
-        const response = await fetch("/api/sendEmail", {
+        const response = await fetch("/api/sendEmail2", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -244,6 +249,7 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
+      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -261,6 +267,7 @@ export const AppContextProvider = ({ children }) => {
         document.cookie = `tyc=${await setCookie("true")}; max-age=28800; path=/`;
         setTycCambio(true);
       } else {
+        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -286,6 +293,7 @@ export const AppContextProvider = ({ children }) => {
         document.cookie = `hasPassword=${await setCookie("true")}; max-age=28800; path=/`;
         setHasPassw(true);
       } else {
+        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -332,9 +340,11 @@ export const AppContextProvider = ({ children }) => {
         );
 
         if (data.status == 200) {
+          console.log("algo",data.datos);
           setRecibosSinFirmarLoading(false);
           setRecibosSinFirmar(data.datos);
         } else {
+          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -364,6 +374,7 @@ export const AppContextProvider = ({ children }) => {
           });
           setRecibosFirmadosLoading(false);
         } else {
+          console.log("ERRORRR recibos");
           setRecibosFirmadosLoading(false);
         }
       } catch (error) {
@@ -401,7 +412,9 @@ export const AppContextProvider = ({ children }) => {
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
+          console.log(data);
         } else {
+          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -426,7 +439,9 @@ export const AppContextProvider = ({ children }) => {
         );
         if (data == 200) {
           setLogLoading(false);
+          console.log(data);
         } else {
+          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -456,11 +471,14 @@ export const AppContextProvider = ({ children }) => {
 
             setClaseLoading(false);
           } else {
+            console.log("ERRORRR getRegistroUnico");
           }
         })
         .catch(function (error) {
+          console.log(error);
         });
     } catch (error) {
+      console.log("ERRORRR getRegistroUnico");
     }
   }, []);
 

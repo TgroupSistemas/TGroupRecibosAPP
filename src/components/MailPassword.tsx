@@ -122,6 +122,7 @@ function censorEmail(email: string): string {
       100000 + Math.random() * 900000
     ).toString(); // Generar código de 6 dígitos
     addVerificationCodeToCookie(verificationCode);
+    console.log(correo, verificationCode);
     await sendVerificationEmail(correo, verificationCode);
   };
 
@@ -143,6 +144,7 @@ function censorEmail(email: string): string {
     }
     if (step === 1) {
       const cookiesArray = getCookieAsArray("cod");
+      console.log(cookiesArray, verificationCode);
       if (!cookiesArray.includes(verificationCode)) {
         setError("Código de verificación incorrecto");
         return;
@@ -167,6 +169,7 @@ function censorEmail(email: string): string {
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
+    console.log(password, confirmPassword);
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");

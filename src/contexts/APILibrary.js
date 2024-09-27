@@ -64,6 +64,7 @@ export async function logeo (credentials) {
                                 config, 
                                 )
                             let datos2 = resp2.data;
+                            console.log(datos2);
 
                             if(datos2.length == 0)
                                 {
@@ -266,6 +267,7 @@ export async function getTokenAPI(empresa) {
 }
 export async function traerPDF(token, id) {
 try {
+    console.log(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`)
       const response = await fetch(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -294,6 +296,7 @@ export async function getRecibos(id, empresa, firmados, page) {
                 `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC&page=${page}`,
                 config
             );
+            console.log("recibo", resp.data);
             return ({ status: 200, datos: resp.data });
 
         } catch (error) {
@@ -345,6 +348,7 @@ export async function LbRegistroClase(pagina, parametros, endpoint, empresa) {
             sqlString = sqlString.slice(0, -5); // remove the last ' AND '
             // URL encode the entire SQL filter string to ensure special characters are correctly interpreted
             const encodedSqlString = encodeURIComponent(sqlString);
+            console.log( `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`)
             const resp = await axios.get(
                 `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`,
                 config
@@ -389,6 +393,7 @@ export const updateRecibo = async (id, estadoFirma, disconformidad, FECHA_ESTADO
     if (disconformidad !== "") {
         data.MOTIVO_DISCONFORMIDAD = disconformidad;
     }
+    console.log(url, data);
     try {
         const response = await axios.put(url, data, config);
         return response.status;
@@ -407,6 +412,7 @@ export const updateCorreo = async (id) => {
         EMAIL_VERIFICADO: true
     };
 
+    console.log(url, data);
     try {
         const response = await axios.put(url, data, config);
         return response.status;
@@ -444,6 +450,7 @@ export const postLog = async (FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_US
                 FK_WS_USUARIOS
     };
 
+    console.log(url, data);
     try {
         const response = await axios.post(url, data, config);
         return response.status;

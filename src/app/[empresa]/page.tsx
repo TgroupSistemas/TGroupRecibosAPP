@@ -95,6 +95,7 @@ export default function Home() {
         if (hasPassword == false) {
           window.location.replace("/");
         }
+        console.log("v", empresa);
       }
       if (!loggedIn ) {
         window.location.replace("/login");
@@ -124,12 +125,14 @@ export default function Home() {
     const username2 = JSON.parse(username) as Empresa[];
     setEmpresas(JSON.parse(username) as Empresa[]);
     setLoadingEmpresa(false);
+    console.log("a", empresas, empresaSt, username);
     setLegajo(
       username2.find((e) => e.FK_WS_CLIENTES == empresaSt)?.FK_SUE_LEGAJOS || 0
     );
   };
   const fetchRecibosFirmados = async (empresa: string) => {
     getRecibosFirmados(empresa);
+    console.log(empresas);
   };
   const fetchRecibosSinFirmar = async (empresa: string) => {
     getRecibosSinFirmar(empresa);
@@ -252,7 +255,7 @@ export default function Home() {
               <div></div>
             )}
           </div>
-          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (
+          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (console.log("WAWAW",recibosFirmados),
             <div className="flex justify-center">
             <button className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200" onClick={()=> fetchRecibosFirmados(window.location.pathname.substring(1))}>
               Ver más recibos

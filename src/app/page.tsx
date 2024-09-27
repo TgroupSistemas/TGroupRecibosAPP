@@ -56,6 +56,7 @@ export default function Home() {
   const fetchEmpresas = async () => {
     setLoadingEmpresa(true);
     const username = await getEmpresasHab();
+    console.log(username);
     setEmpresa(JSON.parse(username) as Empresa[]);
     setLoadingEmpresa(false);
   };
@@ -76,7 +77,7 @@ export default function Home() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        if (await isLoggedIn()) {
+        if (isLoggedIn()) {
           await fetchUsername();
           await fetchname();
           await fetchEmpresas();
@@ -91,6 +92,7 @@ export default function Home() {
         }
         if (hasPassword == true) {
           setHasPass(true);
+          console.log("hasPass", hasPass);
         }
       } catch (error) {
         console.error("Failed to check login status:", error);
@@ -125,6 +127,7 @@ export default function Home() {
             {!loadingEmpresa &&
               empresa.map(
                 (item, index) => (
+                  console.log("a", empresa),
                   (<EmpresaBoton key={index} empresa={item.FK_WS_CLIENTES} />)
                 )
               )}
