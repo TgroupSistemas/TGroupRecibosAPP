@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
-const secretKey = process.env.SECRET_KEY || '6225a4440099930f4ea5e312928264e98d82f9952edb9d7f59543d573907c00b'; // Replace with your own secret key
+const secretKey = 'DCPqifCgWBC8I+CF9Q4ROYQB48CGPeY119BqOQnnbzYhTajr5uBG7vTsgab3I6Va'; // Replace with your own secret key
 
 // Ensure the key is 32 bytes long when converted from hex
 if (Buffer.from(secretKey, 'hex').length !== 32) {
