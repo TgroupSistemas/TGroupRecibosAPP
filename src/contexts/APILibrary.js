@@ -60,11 +60,10 @@ export async function logeo (credentials) {
                             let sqlFilter2 = `ID = '${part1}' AND ID_CLIENTE= '${part2}'`;
                             
                             const resp2 = await axios.get(
-                                `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2} &&cliente=${empresa}`,
+                                `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2}`,
                                 config, 
                                 )
                             let datos2 = resp2.data;
-                            console.log(datos2);
 
                             if(datos2.length == 0)
                                 {
@@ -115,6 +114,35 @@ export async function enviarClase(endpoint, empresa, datosFormularioActual) {
     }
 }
 
+export async function mailUsuario (dni) {
+    let sqlFilter = `USERNAME = '${dni}'`;
+    let respuestaAPI;
+    try {
+      
+
+
+
+            const resp = await axios.get(
+                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=TGROUP&sqlAttributes=EMAIL,ID`,
+                config, 
+                )
+            let datos = resp.data;
+            if(datos.length == 0)
+            {
+                respuestaAPI = 201;
+            }
+            else{
+                respuestaAPI = 200;
+                
+            return ({status: respuestaAPI, datos: datos[0]});
+        } 
+        return ({status: 201});
+    } catch (error) {
+        console.error(error);
+    }
+};
+
+
 export async function cambioPassword(password, id, rs) {
 
     if (id && rs && password) {
@@ -150,6 +178,36 @@ export async function cambioPassword(password, id, rs) {
         });    }
 
 }
+
+
+export async function aceptarTYC(id, rs) {
+
+    if (id && rs) {
+        try {
+            const resp = await axios.put(
+                `${URL}/clases/WS_USUARIOS/${id}?cliente=${rs}`,
+                {
+                    "ACEPTA_TYC": true
+                },
+                config
+            );
+            return ({ status: 200, datos: resp.data });
+
+
+        } catch (error) {
+            console.error(error);
+            return ({
+                status: error.response ? error.response.status : 500,
+                message: error.response ? error.response.data : error.message
+            });        }
+    } else {
+        return ({
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        });    }
+
+}
+
 
 export async function traerEndpoint(filtro, parametros, pagina, empresa, endpoint) {
     const sqlFilter = (filtro && parametros) ? `&&sqlFilter=${encodeURIComponent(generateSqlFilter(parametros, filtro))}` : '';
@@ -208,7 +266,6 @@ export async function getTokenAPI(empresa) {
 }
 export async function traerPDF(token, id) {
 try {
-    console.log(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`)
       const response = await fetch(`${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, '%2F')}?alt=media`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -237,7 +294,6 @@ export async function getRecibos(id, empresa, firmados, page) {
                 `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC&page=${page}`,
                 config
             );
-            console.log("recibo", resp.data);
             return ({ status: 200, datos: resp.data });
 
         } catch (error) {
@@ -289,7 +345,6 @@ export async function LbRegistroClase(pagina, parametros, endpoint, empresa) {
             sqlString = sqlString.slice(0, -5); // remove the last ' AND '
             // URL encode the entire SQL filter string to ensure special characters are correctly interpreted
             const encodedSqlString = encodeURIComponent(sqlString);
-            console.log( `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`)
             const resp = await axios.get(
                 `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`,
                 config
@@ -334,7 +389,6 @@ export const updateRecibo = async (id, estadoFirma, disconformidad, FECHA_ESTADO
     if (disconformidad !== "") {
         data.MOTIVO_DISCONFORMIDAD = disconformidad;
     }
-    console.log(url, data);
     try {
         const response = await axios.put(url, data, config);
         return response.status;
@@ -347,14 +401,12 @@ export const updateRecibo = async (id, estadoFirma, disconformidad, FECHA_ESTADO
     }
 };
 
-export const updateCorreo = async (id, correo) => {
+export const updateCorreo = async (id) => {
     const url = `${URL}/clases/WS_USUARIOS/${id}?cliente=TGROUP`;
-    const data = {
-        EMAIL: correo,   
+    const data = {  
         EMAIL_VERIFICADO: true
     };
 
-    console.log(url, data);
     try {
         const response = await axios.put(url, data, config);
         return response.status;
@@ -392,7 +444,6 @@ export const postLog = async (FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_US
                 FK_WS_USUARIOS
     };
 
-    console.log(url, data);
     try {
         const response = await axios.post(url, data, config);
         return response.status;

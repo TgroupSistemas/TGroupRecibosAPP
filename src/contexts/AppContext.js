@@ -18,7 +18,9 @@ import {
   updateRecibo,
   updateCorreo,
   getTokenAPI,
+  mailUsuario,
   postLog,
+  aceptarTYC,
   traerPDF
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
@@ -28,6 +30,7 @@ dotenv.config();
 const AppContext = createContext();
 
 export const AppContextProvider = ({ children }) => {
+  const [mailVerificadoCambio, setMailVerificadoCambio] = useState(false);
   const [user, setUser] = useState("Usuario");
   const [tareas, setTareas] = useState({});
   const [responseLogin, setResponseLogin] = useState({});
@@ -52,6 +55,7 @@ export const AppContextProvider = ({ children }) => {
   const [PDFLoading, setPDFLoading] = useState(true);
   const [recibosFirmaLoading, setRecibosFirmaLoading] = useState(false);
   const [logLoading, setLogLoading] = useState(false);
+  const [tycCambio, setTycCambio] = useState(false);
   const [filtroEndpointActualFijoPopUp, setFiltroEndpointActualFijoPopUp] =
     useState("");
   const [errorAlert, setErrorAlert] = useState("");
@@ -69,7 +73,6 @@ export const AppContextProvider = ({ children }) => {
         setHasPassw(data.datos.PASSWORD != "" && data.datos.PASSWORD != null ? true : false);
         setResponseLogin(data);
         postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID,);
-        console.log(data);
         document.cookie = "isloggedin=" + await setCookie("true") + "; max-age=28800; path=/";
         document.cookie = `id=${await setCookie(data.datos.ID)}; max-age=28800; path=/`;
         document.cookie = `hasPassword=${await setCookie(data.datos.PASSWORD != "" && data.datos.PASSWORD != null? "true" : "false")}; max-age=28800; path=/`;
@@ -87,6 +90,12 @@ export const AppContextProvider = ({ children }) => {
           "; max-age=28800; path=/";
         document.cookie =
           "username=" + await setCookie(data.datos.USERNAME) + "; max-age=28800; path=/";
+        document.cookie =
+          "mail=" + await setCookie(data.datos.EMAIL) + "; max-age=28800; path=/";
+        document.cookie =
+          "mailverificado=" + await setCookie(data.datos.EMAIL_VERIFICADO.toString()) + "; max-age=28800; path=/";
+          document.cookie =
+          "tyc=" + await setCookie(data.datos.ACEPTA_TYC.toString()) + "; max-age=28800; path=/"; 
         document.cookie =
           "fk_erp_contactos=" +
           await setCookie(data.datos.FK_ERP_CONTACTOS) +
@@ -107,7 +116,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -121,6 +129,12 @@ export const AppContextProvider = ({ children }) => {
     document.cookie = "username=; max-age=0; path=/";
     document.cookie = "fk_erp_contactos=; max-age=0; path=/";
     document.cookie = "menu=; max-age=0; path=/";
+    document.cookie = "mailVerificado=; max-age=0; path=/";
+    document.cookie = "cod=; max-age=0; path=/";
+    document.cookie = "empresasHabilitadas=; max-age=0; path=/";
+    document.cookie = "name=; max-age=0; path=/";
+    document.cookie = "tyc=; max-age=0; path=/";
+
     setHasPassw(false);
 
     window.location.replace("/login");
@@ -163,24 +177,25 @@ export const AppContextProvider = ({ children }) => {
   }, []);
   const [correoLoading, setCorreoLoading] = useState("");
   const [correoError, setCorreoError] = useState("");
-
+  
   const ponerMail = useCallback(
-    async (correo) => {
+    async () => {
       setCorreoLoading(true);
-      console.log(correo);
       const idUser = await getCookie("id");
       try {
         const data = await updateCorreo(
-          idUser,
-          correo
+          idUser
         );
         if (data == 200) {
+          document.cookie =
+          "mailverificado=" + await setCookie("true") + "; max-age=28800; path=/";
+        setMailVerificadoCambio(true);
           setCorreoLoading(false);
         } else {
-          console.log("ERRORRR correo");
         }
       } catch (error) {
         console.error(error);
+        
         setCorreoLoading(false);
         correoError("Error al actualizar el correo");
 
@@ -202,6 +217,59 @@ export const AppContextProvider = ({ children }) => {
     return await getCookie("fl_erp_empresas");
   }, []);
 
+
+  const enviarMailRecuperacion = useCallback(async (dni, nuevaContraseña) => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      const data = await mailUsuario(dni);
+      if (data.status == 200) {
+        const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
+
+        const response = await fetch("/api/sendEmail2", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: data.datos.EMAIL, pass: nuevaContraseña }),
+        });
+    
+        if (!response.ok) {
+          throw new Error("Failed to send verification email");
+        }
+        return true;
+
+      } else {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+  }, []);
+
+
+  const aceptarTerminos = useCallback(async () => {
+    const id = await getCookie("id");
+    try {
+      const data = await aceptarTYC(
+        id,
+        await getCookie("fl_erp_empresas")
+      );
+
+      if (data.status == 200) {
+        document.cookie = `tyc=${await setCookie("true")}; max-age=28800; path=/`;
+        setTycCambio(true);
+      } else {
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+
+
+
   //tolis
   const changePassword = useCallback(async (credentials) => {
     const fl_erp_empresas = await getCookie("fl_erp_empresas");
@@ -218,7 +286,6 @@ export const AppContextProvider = ({ children }) => {
         document.cookie = `hasPassword=${await setCookie("true")}; max-age=28800; path=/`;
         setHasPassw(true);
       } else {
-        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -265,11 +332,9 @@ export const AppContextProvider = ({ children }) => {
         );
 
         if (data.status == 200) {
-          console.log("algo",data.datos);
           setRecibosSinFirmarLoading(false);
           setRecibosSinFirmar(data.datos);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -299,7 +364,6 @@ export const AppContextProvider = ({ children }) => {
           });
           setRecibosFirmadosLoading(false);
         } else {
-          console.log("ERRORRR recibos");
           setRecibosFirmadosLoading(false);
         }
       } catch (error) {
@@ -337,9 +401,7 @@ export const AppContextProvider = ({ children }) => {
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
-          console.log(data);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -364,9 +426,7 @@ export const AppContextProvider = ({ children }) => {
         );
         if (data == 200) {
           setLogLoading(false);
-          console.log(data);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -396,14 +456,11 @@ export const AppContextProvider = ({ children }) => {
 
             setClaseLoading(false);
           } else {
-            console.log("ERRORRR getRegistroUnico");
           }
         })
         .catch(function (error) {
-          console.log(error);
         });
     } catch (error) {
-      console.log("ERRORRR getRegistroUnico");
     }
   }, []);
 
@@ -436,7 +493,6 @@ export const AppContextProvider = ({ children }) => {
     const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].split("=");
-      console.log(cookie);
       if (cookie[0] === name && cookie[1] != '') {
 
         const response = await fetch("/api/getCookies", {
@@ -525,6 +581,7 @@ export const AppContextProvider = ({ children }) => {
         setEndpointFiltroActual,
         endpointFiltroActual,
         ponerMail,
+        enviarMailRecuperacion,
         correoLoading,
         endpointActualPopUp,
         hasPassw,
@@ -534,13 +591,16 @@ export const AppContextProvider = ({ children }) => {
         recibosFirmaLoading,
         getEmpresasHab,
         logLoading,
+        aceptarTerminos,
         getRecibosSinFirmar,
         recibosSinFirmarLoading,
         recibosSinFirmar,
         getRecibosFirmados,
         recibosFirmadosLoading,
         recibosFirmados,
-        fetchPDF,PDF,PDFLoading
+        fetchPDF,PDF,PDFLoading,
+        mailVerificadoCambio,
+        tycCambio
       }}
     >
       {children}

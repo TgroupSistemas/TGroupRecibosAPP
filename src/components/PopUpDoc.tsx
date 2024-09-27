@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import PDFViewer from "@/components/PDFViewer";
 import Firma from './Firma';
+import { useAppContext } from "@/contexts/AppContext";
 
 interface Recibo {
   ARCHIVO: string;
@@ -40,10 +41,15 @@ const getTipoLiquidacion = (tipo: string): string => {
 };
 
 const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) => {
+  const { PDF, PDFLoading } = useAppContext();
   const tipoLiquidacion = getTipoLiquidacion(reciboRecibido.TIP_LIQ);
   const [popUpFirmaOpen, setPopUpFirmaOpen] = useState(false);
   const [estadoFirma, setEstadoFirma] = useState(1);
-  console.log(reciboRecibido);
+  const periodoDate = new Date(`${reciboRecibido.PERIODO}/01`);
+    const currentDate = new Date();
+    const timeDifference = currentDate.getTime() - periodoDate.getTime();
+    const dayDifference = timeDifference / (1000 * 3600 * 24);
+
   return (
 <div
       className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity   duration-500`}
@@ -66,19 +72,27 @@ const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) 
           <p><span className='font-bold'>Motivo de disconformidad: </span>{reciboRecibido.MOTIVO_DISCONFORMIDAD}</p>
         )}                <div className="flex justify-betwee w-full mt-3">
 
+        
+{dayDifference <= 40 || (reciboRecibido.ESTADO_FIRMA != 'X' && reciboRecibido.ESTADO_FIRMA != 'F') ? (
+      <>
         <button
-            className="px-4 py-2 mr-2 w-full bg-verde text-white rounded hover:bg-green-700 transition-all"
-            onClick={() => {setPopUpFirmaOpen(true), setEstadoFirma(1)}}
-
-          >
-            Firmar
-          </button>
-          <button
-            className="px-4 py-2 w-full bg-rojo text-white rounded hover:bg-red-700 transition-all"
-            onClick={() => {setPopUpFirmaOpen(true), setEstadoFirma(2)}}
-          >
-            Firmar en disconformidad
-          </button>
+          className={`px-4 py-2 mr-2 w-full text-white rounded transition-all ${reciboRecibido.ESTADO_FIRMA === 'F' || (!PDFLoading && !PDF) ? 'bg-gray-400 cursor-not-allowed' : 'bg-verde hover:bg-green-700'}`}
+          onClick={() => { setPopUpFirmaOpen(true); setEstadoFirma(1); }}
+          disabled={reciboRecibido.ESTADO_FIRMA === 'F' || (!PDFLoading && !PDF)}
+        >
+          {!PDFLoading && !PDF ? 'Firmar' : reciboRecibido.ESTADO_FIRMA === 'X' ? 'Cambiar a firma en conformidad' : 'Firmar'}
+        </button>
+        <button
+          className={`px-4 py-2 w-full text-white rounded transition-all ${reciboRecibido.ESTADO_FIRMA === 'X' || (!PDFLoading && !PDF) ? 'bg-gray-400 cursor-not-allowed' : 'bg-rojo hover:bg-red-700'}`}
+          onClick={() => { setPopUpFirmaOpen(true); setEstadoFirma(2); }}
+          disabled={reciboRecibido.ESTADO_FIRMA === 'X' || (!PDFLoading && !PDF)}
+        >
+          {!PDFLoading && !PDF ? 'Firmar en disconformidad' : reciboRecibido.ESTADO_FIRMA === 'X' ? 'Cambiar a firma en disconformidad' : 'Firmar en disconformidad'}
+        </button>
+      </>
+    ) : (
+      <p className="text-red-500">Ha pasado el límite de 40 días para cambiar el estado de la firma.</p>
+    )}
           
         </div>
         
@@ -86,7 +100,7 @@ const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) 
         <div style={{ height: '30em' }} className=''>        <PDFViewer id={reciboRecibido.ARCHIVO}></PDFViewer>
         </div>
         <button
-            className="px-4 py-2 mb-3 w-full mt-15 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-all"
+            className="px-4 py-2 mb-3 w-full mt-15 bg-gray-300 text-gray-700 rounded hover:bg-gray-200 transition-all"
            onClick={() => cerrar(false)}
           >
             Cerrar

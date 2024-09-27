@@ -68,6 +68,7 @@ export default function Home() {
     getRecibosSinFirmar,
     recibosFirmadosLoading,
     recibosSinFirmarLoading,
+    getCookie
   } = useAppContext();
 
   const [user, setUser] = useState("...");
@@ -94,10 +95,15 @@ export default function Home() {
         if (hasPassword == false) {
           window.location.replace("/");
         }
-        console.log("v", empresa);
       }
-      if (!loggedIn) {
+      if (!loggedIn ) {
         window.location.replace("/login");
+      }
+      if (await getCookie("mailverificado") != "true") {
+        window.location.replace("/");
+      }
+      if (await getCookie("tyc") != "true") {
+        window.location.replace("/");
       }
     };
 
@@ -118,14 +124,12 @@ export default function Home() {
     const username2 = JSON.parse(username) as Empresa[];
     setEmpresas(JSON.parse(username) as Empresa[]);
     setLoadingEmpresa(false);
-    console.log("a", empresas, empresaSt, username);
     setLegajo(
       username2.find((e) => e.FK_WS_CLIENTES == empresaSt)?.FK_SUE_LEGAJOS || 0
     );
   };
   const fetchRecibosFirmados = async (empresa: string) => {
     getRecibosFirmados(empresa);
-    console.log(empresas);
   };
   const fetchRecibosSinFirmar = async (empresa: string) => {
     getRecibosSinFirmar(empresa);
@@ -134,8 +138,8 @@ export default function Home() {
   return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>
-      <section>
-        <div className="container mx-auto bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg">
+      <section className="pt-40 md:pt-20">
+        <div className="container mx-auto  bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold"></h1>
             {!recibosLoading ? (
@@ -248,7 +252,7 @@ export default function Home() {
               <div></div>
             )}
           </div>
-          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (console.log("WAWAW",recibosFirmados),
+          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (
             <div className="flex justify-center">
             <button className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200" onClick={()=> fetchRecibosFirmados(window.location.pathname.substring(1))}>
               Ver más recibos
@@ -258,6 +262,7 @@ export default function Home() {
       </section>
       {popUpOpen && (
         <PopUpDoc
+        
           reciboRecibido={actualRecibo}
           cerrar={setPopUpOpen}
           empresa={empresaSt}

@@ -17,8 +17,8 @@ export default function Navbar() {
     fetchname();
   }, [getName]);
     return (
-      <>
-        <header className="text-black bg-white body-font">
+      <div className="z-50	fixed w-full">
+        <header className="text-black bg-white body-font ">
         <div className="shadownav ">
       <div className="container mx-auto flex flex-wrap p-3 px-5 flex-col  md:flex-row items-center shadow-md">
       <Link className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" href={`/`}>
@@ -37,6 +37,6 @@ export default function Navbar() {
     </header>
 
       {open && <Logout setPopUpLogoutOpen={setOpen} />}
-    </>
+    </div>
     )
 }

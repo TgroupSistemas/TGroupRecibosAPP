@@ -28,7 +28,6 @@ export default function Firma(props: FirmaProps) {
     setEstadoLoadFirma("F");
 
     updateReciboFirmado(props.id, "F", "", props.empresa).then((response: any) => {
-      console.log(response);
     });
   };
   useEffect(() => {
@@ -49,7 +48,6 @@ export default function Firma(props: FirmaProps) {
     setEstadoLoadFirma("X");
 
     updateReciboFirmado(props.id, "X", motivo, props.empresa).then((response: any) => {
-      console.log(response);
     });
   };
 

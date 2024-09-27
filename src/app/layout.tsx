@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import { AppContextProvider } from "@/contexts/AppContext"; // Import the AppContextProvider
+import Head from 'next/head'; // Import Head from next/head
 
 export default function RootLayout({
   children,
@@ -10,7 +11,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="bg-white">
+      <head>
+        <title>Portal Sueldos</title>
+      </head>
       <body className="">
+        
         <AppContextProvider> {/* Wrap the children with AppContextProvider */}
           {children}
         </AppContextProvider>
