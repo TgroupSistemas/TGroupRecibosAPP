@@ -317,7 +317,7 @@ export async function LbGetClases(empresa) {
     if (empresa) {
         try {
             const resp = await axios.get(
-                `${URL}/clases/WS_CLASES?cliente=${empresa}`,
+                `${URL}/clases/WS_CLASES`,
                 config
                 );
             return ({ status: 200, datos: resp.data });

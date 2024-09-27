@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
-const secretKey = process.env.SECRET_KEY || '71dd225fc44c264fb2fe9f4d5de3965b3ca91306c974db5d14fcaafe41371052'; // Replace with your own secret key
+const secretKey = '71dd225fc44c264fb2fe9f4d5de3965b3ca91306c974db5d14fcaafe41371052'; // Replace with your own secret key
 
 // Function to encrypt data
 const encrypt = (text: string): string => {
