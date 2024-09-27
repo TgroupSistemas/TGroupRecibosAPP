@@ -227,7 +227,7 @@ export const AppContextProvider = ({ children }) => {
       if (data.status == 200) {
         const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
 
-        const response = await fetch("/api/sendEmail2", {
+        const response = await fetch("/api/sendEmail", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
