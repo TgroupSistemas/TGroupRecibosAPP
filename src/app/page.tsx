@@ -76,7 +76,7 @@ export default function Home() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
-        if (isLoggedIn()) {
+        if (await isLoggedIn()) {
           await fetchUsername();
           await fetchname();
           await fetchEmpresas();
