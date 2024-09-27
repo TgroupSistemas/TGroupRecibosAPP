@@ -2,29 +2,31 @@ import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
 const secretKey = process.env.SECRET_KEY || '6225a4440099930f4ea5e312928264e98d82f9952edb9d7f59543d573907c00b'; // Replace with your own secret key
+
+// Ensure the key is 32 bytes long when converted from hex
 if (Buffer.from(secretKey, 'hex').length !== 32) {
-    throw new Error('Invalid key length. Key must be 32 bytes long.');
-  }
+  throw new Error('Invalid key length. Key must be 32 bytes long.');
+}
+
 // Function to encrypt data
 const encrypt = (text: string): string => {
-    const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey, 'hex'), iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-  };
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(secretKey, 'hex'), iv);
+  let encrypted = cipher.update(text);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return iv.toString('hex') + ':' + encrypted.toString('hex');
+};
 
 // Function to decrypt data
 const decrypt = (text: string): string => {
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift()!, 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(secretKey, 'hex'), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-  };
-
+  const textParts = text.split(':');
+  const iv = Buffer.from(textParts.shift()!, 'hex');
+  const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+  const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(secretKey, 'hex'), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+};
   export async function POST(req: NextRequest) {
 
     const { cookie, method } = await req.json();
