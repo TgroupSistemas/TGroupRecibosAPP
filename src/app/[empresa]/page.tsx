@@ -70,6 +70,7 @@ export default function Home() {
     recibosSinFirmarLoading,
     getCookie
   } = useAppContext();
+  const [verifLoading, setVerifLoading] = useState(true);
 
   const [user, setUser] = useState("...");
   const [name, setName] = useState("...");
@@ -82,6 +83,7 @@ export default function Home() {
   const [empresaSt, setEmpresa] = useState("");
   useEffect(() => {
     const fetchData = async () => {
+      setVerifLoading(true);
       if (typeof window !== "undefined") {
         const empresa = window.location.pathname.substring(1);
         setEmpresa(window.location.pathname.substring(1));
@@ -106,6 +108,7 @@ export default function Home() {
       if (await getCookie("tyc") != "true") {
         window.location.replace("/");
       }
+      setVerifLoading(false);
     };
 
     fetchData();
@@ -140,6 +143,8 @@ export default function Home() {
 
   return (
     <UpdateTriggerProvider>
+            {verifLoading ? (<></>) : (
+        <>
       <Navbar></Navbar>
       <section className="pt-40 md:pt-20">
         <div className="container mx-auto  bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg">
@@ -271,6 +276,7 @@ export default function Home() {
           empresa={empresaSt}
         ></PopUpDoc>
       )}
+      </>)}
     </UpdateTriggerProvider>
   );
 }

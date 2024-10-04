@@ -40,6 +40,7 @@ export default function Home() {
   const [mailVerificado, setMailv] = useState<string>("");
   const [tycState, setTycState] = useState<string>("");
   const [mail, setMail] = useState<string>("");
+  const [verifLoading, setVerifLoading] = useState(true);
   const [overlayContra, setOverlayContra] = useState(false);
   const handleButtonClick = () => {
     setOverlayContra(true); 
@@ -77,6 +78,7 @@ export default function Home() {
   useEffect(() => {
     const checkLoginStatus = async () => {
       try {
+        setVerifLoading(true);
         if (isLoggedIn()) {
           await fetchUsername();
           await fetchname();
@@ -94,8 +96,13 @@ export default function Home() {
           setHasPass(true);
           console.log("hasPass", hasPass);
         }
+        setVerifLoading(false);
+
       } catch (error) {
+        window.location.replace("/login");
+
         console.error("Failed to check login status:", error);
+
       }
     };
     checkLoginStatus();
@@ -111,6 +118,8 @@ export default function Home() {
   }, [hasPassw, mailVerificadoCambio, tycCambio]);
   return (
     <UpdateTriggerProvider>
+      {verifLoading ? (<></>) : (
+        <>
       <Navbar />
       <section className="text-gray-600 pt-20 bg-white body-font">
         <div className="container px-5  py-24 mx-auto">
@@ -151,9 +160,11 @@ export default function Home() {
         <MailPassword hasPass={hasPass} mail={mail} mailv={mailVerificado} tyc={tycState} />
       )}
       </section>
+
       {overlayContra && (
         <ChangePassword setPopUpOpen={setOverlayContra}></ChangePassword>
       )}
+    </>)}
 
     </UpdateTriggerProvider>
   );

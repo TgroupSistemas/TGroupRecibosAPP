@@ -21,6 +21,7 @@ import {
   mailUsuario,
   postLog,
   aceptarTYC,
+  datosUsuario,
   traerPDF
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
@@ -137,7 +138,8 @@ export const AppContextProvider = ({ children }) => {
     document.cookie = "empresasHabilitadas=; max-age=0; path=/";
     document.cookie = "name=; max-age=0; path=/";
     document.cookie = "tyc=; max-age=0; path=/";
-
+    document.cookie = "mail=; max-age=0; path=/";
+    document.cookie = "mailverificado=; max-age=0; path=/";
     setHasPassw(false);
 
     window.location.replace("/login");
@@ -254,6 +256,25 @@ export const AppContextProvider = ({ children }) => {
     }
   }, []);
 
+  const traerDatosPerfil = useCallback(async (dni) => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      const data = await datosUsuario(dni);
+      if (data.status == 200) {
+        console.log(data, "ASDA");
+        return data.datos;
+    
+
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
 
   const aceptarTerminos = useCallback(async () => {
     const id = await getCookie("id");
@@ -605,6 +626,7 @@ export const AppContextProvider = ({ children }) => {
         hasPassw,
         addAlert,
         alerts,
+        traerDatosPerfil,
         removeAlert,
         recibosFirmaLoading,
         getEmpresasHab,

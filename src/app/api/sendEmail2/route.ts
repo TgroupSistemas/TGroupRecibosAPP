@@ -25,11 +25,11 @@ export async function POST(req: NextRequest) {
       <table role="presentation" style="background-color: #fff;  padding: 20px 60px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); font-family: Arial, sans-serif; line-height: 1.6; text-align: center;">
         <tr>
           <td>
-            <h2 style="color: #333;">Código de Verificación Tgroup</h2>
+            <h2 style="color: #333;">Recuperación de contraseña</h2>
             <p>¡Hola!</p>
             <p>Tu nueva contraseña es:</p>
             <p style="font-size: 24px; text-align: center; font-weight: bold; color: #4CAF50; border: 1px solid #4CAF50; border-radius: 10px; padding: 10px;">${pass}</p>
-            <p>Para cambiar...</p>
+            <p>Una vez ingreses a la web, podés cambiar la contraseña presionando el boton con una llave 🔑 ubicado en la pantalla principal. </p>
           </td>
         </tr>
       </table>
