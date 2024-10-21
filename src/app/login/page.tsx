@@ -10,14 +10,19 @@ export default function Home() {
   const [dni, setDNI] = useState<string>("");
   const [password, setPassword] = useState('');
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [openForgot, setOpenForgot] = useState(false);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    setLoading(true);
+
     const response = await loginUser({
       dni, // Make sure to use the state variables here
       password
     });
     if (!response) {
+      setLoading(false);
+
       setError("Error al iniciar sesión. Por favor, verifique los datos ingresados.");
   }
     
@@ -73,8 +78,11 @@ export default function Home() {
           <button type="submit" className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Acceder</button>
         </div>
       </form>
-  
+      {loading && <div className="flex justify-center">
+               <span className="loading loading-infinity loading-lg"></span>
+             </div>}
     </div>
+      
   </div>
   {openForgot && <ForgotPassword setPopUpForgotOpen={setOpenForgot}></ForgotPassword>}
     </UpdateTriggerProvider>

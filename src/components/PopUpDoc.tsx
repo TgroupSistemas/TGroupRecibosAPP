@@ -52,9 +52,9 @@ const PopUpDoc: React.FC<PopUpDocProps> = ({ reciboRecibido, cerrar, empresa }) 
 
   return (
 <div
-      className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity   duration-500`}
+      className={`fixed inset-0 flex items-center top-16 md:pt-0 pt-20 overflow-y justify-center bg-black bg-opacity-50 transition-opacity   duration-500`}
       
-    >      <div className="bg-white text-slate-600  pt-4 px-4 md:p-8 rounded-lg shadow w-full lg:w-4/6 md:w-4/5 mx-3 h-fit mt-10">
+    >      <div style={{ maxHeight: '80vh' }} className="bg-white text-slate-600 pt-4 px-4 lg:h-min md:h-5/6 h-full md:p-8 rounded-lg shadow w-full lg:w-4/6 md:w-4/5  min-h-5/6 overflow-y-auto mt-10">
       
         <h2 className="text-xl text-black font-bold mb-3">{tipoLiquidacion} - {reciboRecibido.PERIODO}</h2>
         <p><span className='font-bold '>Estado: </span>          {

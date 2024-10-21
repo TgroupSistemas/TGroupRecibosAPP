@@ -21,6 +21,7 @@ import {
   mailUsuario,
   postLog,
   aceptarTYC,
+  aceptarVDP,
   datosUsuario,
   traerPDF
 } from "./APILibrary";
@@ -57,6 +58,7 @@ export const AppContextProvider = ({ children }) => {
   const [recibosFirmaLoading, setRecibosFirmaLoading] = useState(false);
   const [logLoading, setLogLoading] = useState(false);
   const [tycCambio, setTycCambio] = useState(false);
+  const [vdpCambio, setVdpCambio] = useState(false);
   const [filtroEndpointActualFijoPopUp, setFiltroEndpointActualFijoPopUp] =
     useState("");
   const [errorAlert, setErrorAlert] = useState("");
@@ -99,6 +101,8 @@ export const AppContextProvider = ({ children }) => {
           const tycValue = data.datos.ACEPTA_TYC != null ? data.datos.ACEPTA_TYC.toString() : "false"; // Default to "false" if null or undefined
           document.cookie =
           "tyc=" + await setCookie(tycValue) + "; max-age=28800; path=/"; 
+          document.cookie =
+          "vdp=" + await setCookie(data.datos.ACEPTA_DP) + "; max-age=28800; path=/"; 
         document.cookie =
           "fk_erp_contactos=" +
           await setCookie(data.datos.FK_ERP_CONTACTOS) +
@@ -131,6 +135,8 @@ export const AppContextProvider = ({ children }) => {
     document.cookie = "fl_erp_empresas=; max-age=0; path=/";
     document.cookie = "elecom_vendedor=; max-age=0; path=/";
     document.cookie = "username=; max-age=0; path=/";
+    document.cookie = "vdp=; max-age=0; path=/";
+
     document.cookie = "fk_erp_contactos=; max-age=0; path=/";
     document.cookie = "menu=; max-age=0; path=/";
     document.cookie = "mailVerificado=; max-age=0; path=/";
@@ -296,7 +302,26 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
 
+  const setVDP = useCallback(async (ver) => {
+    const id = await getCookie("id");
+    try {
+      const data = await aceptarVDP(
+        id,
+        await getCookie("fl_erp_empresas"),
+        ver
 
+      );
+
+      if (data.status == 200) {
+        document.cookie = `vdp=${await setCookie(ver)}; max-age=28800; path=/`;
+        setVdpCambio(true);
+      } else {
+        console.log("ERRORRR cambio password");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   //tolis
   const changePassword = useCallback(async (credentials) => {
@@ -640,7 +665,10 @@ export const AppContextProvider = ({ children }) => {
         recibosFirmados,
         fetchPDF,PDF,PDFLoading,
         mailVerificadoCambio,
-        tycCambio
+        tycCambio,
+        setVDP,
+        vdpCambio,
+
       }}
     >
       {children}

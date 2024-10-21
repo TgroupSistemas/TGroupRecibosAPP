@@ -234,7 +234,33 @@ export async function aceptarTYC(id, rs) {
         });    }
 
 }
+export async function aceptarVDP(id, rs, ver) {
 
+    if (id && rs) {
+        try {
+            const resp = await axios.put(
+                `${URL}/clases/WS_USUARIOS/${id}?cliente=${rs}`,
+                {
+                    "ACEPTA_DP": ver
+                },
+                config
+            );
+            return ({ status: 200, datos: resp.data });
+
+
+        } catch (error) {
+            console.error(error);
+            return ({
+                status: error.response ? error.response.status : 500,
+                message: error.response ? error.response.data : error.message
+            });        }
+    } else {
+        return ({
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        });    }
+
+}
 
 export async function traerEndpoint(filtro, parametros, pagina, empresa, endpoint) {
     const sqlFilter = (filtro && parametros) ? `&&sqlFilter=${encodeURIComponent(generateSqlFilter(parametros, filtro))}` : '';
