@@ -260,7 +260,7 @@ export default function Home() {
               <div></div>
             )}
           </div>
-          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (console.log("WAWAW",recibosFirmados),
+          {!recibosFirmadosLoading && recibosFirmados[recibosFirmados.length - 1].length == 20 && (
             <div className="flex justify-center">
             <button className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200" onClick={()=> fetchRecibosFirmados(window.location.pathname.substring(1))}>
               Ver más recibos

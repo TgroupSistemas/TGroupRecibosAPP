@@ -23,10 +23,12 @@ import {
   aceptarTYC,
   aceptarVDP,
   datosUsuario,
+  traerEmpresas,
   traerPDF
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
+import { get } from "http";
 dotenv.config();
 
 const AppContext = createContext();
@@ -165,10 +167,38 @@ export const AppContextProvider = ({ children }) => {
     if (await await getCookie("empresasHabilitadas") == null) {
       return [];
     }
+
     return (
       await getCookie("empresasHabilitadas")
     );
   }, []);
+
+
+  const getEmpresasHab2 = useCallback(async () => {
+    try {
+        const empresasHabilitadas = await getCookie("empresasHabilitadas");
+        if (empresasHabilitadas == null) {
+            return [];
+        }
+
+        const result = await traerEmpresas(empresasHabilitadas, await getCookie("fl_erp_empresas"));
+
+        // Map through empresasHabilitadas and add the corresponding DESCRIPCION
+        const combinedArray = result.datos.map(item1 => {
+          const matchingItem = JSON.parse(empresasHabilitadas).find(item2 => item2.FK_WS_CLIENTES === item1.CODIGO);
+          if (matchingItem) {
+            const { CODIGO, ...remainingFields } = item1; // Remove CODIGO
+            return { DESCRIPCION: remainingFields.DESCRIPCION, ...matchingItem };
+          }
+          return item1;
+        });
+        return combinedArray;
+    } catch (error) {
+        console.error("Error in getEmpresasHab2:", error);
+        return [];
+    }
+}, []);
+
   const getEmpresaName = useCallback(async () => {
     if (await await getCookie("fl_erp_empresas") == null) {
       return "TGROUP";
@@ -302,13 +332,15 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
 
-  const setVDP = useCallback(async (ver) => {
+  const setVDP = useCallback(async (ver, desc = "") => {
     const id = await getCookie("id");
     try {
       const data = await aceptarVDP(
         id,
         await getCookie("fl_erp_empresas"),
-        ver
+        ver,
+        desc,
+        generarHora()
 
       );
 
@@ -667,6 +699,7 @@ export const AppContextProvider = ({ children }) => {
         mailVerificadoCambio,
         tycCambio,
         setVDP,
+        getEmpresasHab2,
         vdpCambio,
 
       }}

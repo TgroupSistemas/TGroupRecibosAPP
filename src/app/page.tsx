@@ -15,6 +15,7 @@ interface Empresa {
   FEC_ULT_ACT: Date | null;
   FK_SUE_LEGAJOS: number;
   FK_WS_CLIENTES: string;
+  DESCRIPCION: string;
 }
 export default function Home() {
   const {
@@ -30,6 +31,7 @@ export default function Home() {
     getUsername,
     getName,
     getEmpresasHab,
+    getEmpresasHab2,
     tycCambio,
     vdpCambio,
   } = useAppContext();
@@ -58,9 +60,8 @@ export default function Home() {
   };
   const fetchEmpresas = async () => {
     setLoadingEmpresa(true);
-    const username = await getEmpresasHab();
-    console.log(username);
-    setEmpresa(JSON.parse(username) as Empresa[]);
+    const username2 = await getEmpresasHab2();
+    setEmpresa(username2 as Empresa[]);
     setLoadingEmpresa(false);
   };
   const fetchMail = async () => {
@@ -101,7 +102,6 @@ export default function Home() {
         }
         if (hasPassword == true) {
           setHasPass(true);
-          console.log("hasPass", hasPass);
         }
         setVerifLoading(false);
 
@@ -143,8 +143,7 @@ export default function Home() {
             {!loadingEmpresa &&
               empresa.map(
                 (item, index) => (
-                  console.log("a", empresa),
-                  (<EmpresaBoton key={index} empresa={item.FK_WS_CLIENTES} />)
+                  (<EmpresaBoton key={index} destino={item.FK_WS_CLIENTES} empresa={item.DESCRIPCION} />)
                 )
               )}
           </div>

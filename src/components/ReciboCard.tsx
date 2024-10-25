@@ -69,7 +69,7 @@ const ReciboCard: React.FC<ReciboCardProps> = ({
     set(recibo);
 
     set2(true);
-    await postLogRecibo(empresa, "D", recibo.ID, getCookie("id"));
+    await postLogRecibo(empresa, "D", recibo.ID, await getCookie("id"));
 
   };
 

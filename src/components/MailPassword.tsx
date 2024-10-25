@@ -19,7 +19,10 @@ export default function MailPassword(props: mailProps) {
   });
 
   const [email, setEmail] = useState("");
+  const [datoIncorrecto, setDatoIncorrecto] = useState("");
+  const [errorDato, setErrorDato] = useState("");
   const [error, setError] = useState("");
+  const [stepDatos, setStepDatos] = useState(0);
   const [loading, setLoading] = useState(true);
   const [datosUsuario, setDatosUsuario] = useState({});
   const [verificationCode, setVerificationCode] = useState("");
@@ -34,7 +37,7 @@ export default function MailPassword(props: mailProps) {
     aceptarTerminos,
     traerDatosPerfil,
     getCookie,
-    setVDP
+    setVDP,
   } = useAppContext();
   const [timer, setTimer] = useState(61);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -173,8 +176,18 @@ export default function MailPassword(props: mailProps) {
         setStep(4);
       }
     }
-    if(step == 4){
-      setVDP(ver);
+    if (step == 4) {
+      if (ver === "X") {
+        if (datoIncorrecto === "") {
+          setErrorDato("Campo requerido");
+          return;
+        }
+        setVDP(ver, datoIncorrecto);
+      }
+      else{
+        setVDP(ver);
+
+      }
     }
     if (step === 0) {
       envio();
@@ -406,18 +419,37 @@ export default function MailPassword(props: mailProps) {
                     ))}
                   </div>
                 </div>{" "}
+                {stepDatos === 0 ? (
+                  <>
                 <button
                   className="px-1 py-3 mr-2 w-full bg-verde text-white rounded hover:bg-green-700 transition-all mt-1"
                   onClick={() => handleClick("F")}
                 >
                   Los datos son correctos
                 </button>
-                <button
-                  className="px-1 py-3 mr-2 mt-2 w-full bg-rojo text-white rounded hover:bg-red-700 transition-all mt-1"
-                  onClick={() => handleClick("X")}
-                >
-                  Hay datos incorrectos
-                </button>
+
+                  <button
+                    className="px-1 py-3 mr-2 mt-2 w-full bg-rojo text-white rounded hover:bg-red-700 transition-all mt-1"
+                    onClick={() => setStepDatos(1)}
+                  >
+                    Hay datos incorrectos
+                  </button>
+                  </>
+                ) : (
+                  <>
+                  <label htmlFor="dni" className="block text-md mb-2 mt-4 font-medium leading-6 text-gray-900">Indicanos que datos son incorrectos</label>
+
+                  <input type="text" id="datoIncorrecto" onChange={e => setDatoIncorrecto(e.target.value)} className="block pl-2  w-full rounded-md border-0 py-1.5 bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+                  {errorDato && <span className="text-red-500">{errorDato}</span>}
+
+                  <button
+                    className="px-1 py-3 mr-2 mt-2 w-full bg-rojo text-white rounded hover:bg-red-700 transition-all mt-1"
+                    onClick={() => handleClick("X")}
+                  >
+                    Enviar
+                  </button>
+                  </>
+                )}
               </div>
             ) : (
               <div className="flex justify-center">

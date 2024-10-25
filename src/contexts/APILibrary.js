@@ -234,7 +234,7 @@ export async function aceptarTYC(id, rs) {
         });    }
 
 }
-export async function aceptarVDP(id, rs, ver) {
+export async function aceptarVDP(id, rs, ver, desc, hora) {
 
     if (id && rs) {
         try {
@@ -245,6 +245,20 @@ export async function aceptarVDP(id, rs, ver) {
                 },
                 config
             );
+            if(ver == "X")
+            {
+                const resp2 = await axios.post(
+                    `${URL}/clases/WS_NOTIFICACIONES/?cliente=${rs}`,
+                    {
+                        "FK_WS_USUARIOS": id,
+                        "OPERACION": "D",
+                        "NOTAS": desc,
+                        "FECHA_HORA": hora
+                    },
+                    config
+                );
+            }
+
             return ({ status: 200, datos: resp.data });
 
 
@@ -270,6 +284,32 @@ export async function traerEndpoint(filtro, parametros, pagina, empresa, endpoin
     );
     return ({ status: 200, datos: resp.data });
 };
+function generateSqlFilter2(da) {
+    const data = JSON.parse(da);
+    
+    // Check if the array is valid and not empty
+    if (!data || data.length === 0) {
+        return '';
+    }
+
+    // Extract FK_WS_CLIENTES values
+    const fkWsClientesValues = data.map(empresa => empresa.FK_WS_CLIENTES).filter(value => value);
+
+    // Construct the filter string
+    const filterString = fkWsClientesValues.map(value => `CODIGO LIKE '%${value}%'`).join(' OR ');
+
+    return filterString;
+}
+
+
+export async function traerEmpresas(filtro, empresa) {
+    const sqlFilter = (filtro) ? `&sqlFilter=${encodeURIComponent(generateSqlFilter2(filtro))}` : '';
+    const resp = await axios.get(
+      `${URL}/clases/WS_EMPRESAS_TGR?cliente=${empresa}${sqlFilter}`,
+      config
+    );
+    return ({ status: 200, datos: resp.data });
+}
 
 
 export async function getRegistroUnico(id, endpoint, empresa) {
