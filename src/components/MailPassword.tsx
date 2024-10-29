@@ -188,6 +188,14 @@ export default function MailPassword(props: mailProps) {
         setVDP(ver);
 
       }
+      if (props.hasPass != true) {
+        setStep(2);
+      }
+      if (props.mailv != "true") {
+        setStep(0);
+      }
+
+      
     }
     if (step === 0) {
       envio();
@@ -241,7 +249,7 @@ export default function MailPassword(props: mailProps) {
 
           {step === 3 && (
             <div>
-              <div className="max-h-96 overflow-y-auto p-4 border border-gray-300 rounded-md">
+              <div className="max-h-80 overflow-y-auto p-4 border border-gray-300 rounded-md">
                 <p className="text-sm text-gray-600">
                   <span className="font-bold">
                     TÉRMINOS Y CONDICIONES DE USO DEL PORTAL DE SUELDOS
@@ -407,7 +415,7 @@ export default function MailPassword(props: mailProps) {
           {step === 4 &&
             (!loading ? (
               <div>
-                <div className=" max-h-60 overflow-y-auto p-4 mb-3 border border-gray-300 rounded-md">
+                <div className=" max-h-56 overflow-y-auto p-4 mb-3 border border-gray-300 rounded-md">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 pb-6">
                     {Object.entries(datosUsuario).map(([key, value]) => (
                       <div key={key} className="flex flex-col">

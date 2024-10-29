@@ -91,13 +91,12 @@ fetchData();
         </div>
         <h2 className="text-xl text-gray-600 text-center font-bold ">Tus datos:</h2>
         <div className="flex justify-center">
-        <hr className="md:my-4 mt-2 border-gray-300 w-2/6" /> 
 
         </div>
 
         <div className="flex justify-center">
           
-        <div className="bg-white rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-4 md:flex-row flex flex-col ">
+        <div className="bg-white border-gray-200 border-2 rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-8 md:flex-row flex flex-col ">
           <div className="w-full md:w-1/2 pr-4 md:flex-row flex flex-col justify-center md:justify-around">
             <div>
               <div className="mb-4">
@@ -143,7 +142,7 @@ fetchData();
               </div>
             </div>
           </div>
-          <div className="w-px bg-gray-300 mx-16"></div>
+          <div className="w-px bg-gray-200 mx-16"></div>
           <div className="w-30 md:pl-4 mt-10 md:mt-0 mb-10 md:mb-0">
             <div className="mb-4 ">
               <label className="block text-gray-700 font-bold">CUIL:</label>
