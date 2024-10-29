@@ -12,7 +12,7 @@ export default function MailPassword(props: mailProps) {
   console.log("ASDA", props.vdp);
   const [step, setStep] = useState(() => {
     if (props.tyc === "true") {
-      return props.vdp === "true" ? 0 : 4;
+      return (props.vdp !== "F" && props.vdp !== "F" ) ? 4 : 0;
     } else {
       return 3;
     }
@@ -172,7 +172,7 @@ export default function MailPassword(props: mailProps) {
       if (props.mailv != "true") {
         setStep(0);
       }
-      if (props.vdp != "true") {
+      if (props.vdp != "F" && props.vdp != "X") {
         setStep(4);
       }
     }
@@ -234,7 +234,7 @@ export default function MailPassword(props: mailProps) {
       className={`fixed inset-0 z-10 flex md:pt-0 pt-10 items-center justify-center bg-black bg-opacity-50 transition-opacity   duration-500`}
     >
       {" "}
-      <div className="bg-white px-8 pt-6 pb-3 rounded-lg shadow w-4/5 md:w-3/6  mt-10 ">
+      <div className="bg-white px-8 pt-6 pb-3 rounded-lg shadow w-4/5 md:w-3/6 mt-10 ">
         <h2 className="text-xl font-bold mb-4 text-black">{title[step]}</h2>
         <div className=" justify-center">
           <h3 className="font-bold  text-gray-600 mb-2">{message[step]} </h3>
@@ -407,7 +407,7 @@ export default function MailPassword(props: mailProps) {
           {step === 4 &&
             (!loading ? (
               <div>
-                <div className="md:max-h-96  max-h-60 overflow-y-auto p-4 mb-3 border border-gray-300 rounded-md">
+                <div className=" max-h-60 overflow-y-auto p-4 mb-3 border border-gray-300 rounded-md">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 pb-6">
                     {Object.entries(datosUsuario).map(([key, value]) => (
                       <div key={key} className="flex flex-col">

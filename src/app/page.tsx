@@ -75,6 +75,7 @@ export default function Home() {
   };
   const fetchVdp = async () => {
     const vdp = await getCookie("vdp");
+
     setVerificaDatos(vdp);
   };
   const fetchTYC = async () => {
