@@ -98,8 +98,9 @@ export const AppContextProvider = ({ children }) => {
           "username=" + await setCookie(data.datos.USERNAME) + "; max-age=28800; path=/";
         document.cookie =
           "mail=" + await setCookie(data.datos.EMAIL) + "; max-age=28800; path=/";
+          const datmail = data.datos.EMAIL_VERIFICADO != null ? data.datos.EMAIL_VERIFICADO.toString() : "false"; // Default to "false" if null or undefined
         document.cookie =
-          "mailverificado=" + await setCookie(data.datos.EMAIL_VERIFICADO.toString()) + "; max-age=28800; path=/";
+          "mailverificado=" + await setCookie(datmail) + "; max-age=28800; path=/";
           const tycValue = data.datos.ACEPTA_TYC != null ? data.datos.ACEPTA_TYC.toString() : "false"; // Default to "false" if null or undefined
           document.cookie =
           "tyc=" + await setCookie(tycValue) + "; max-age=28800; path=/"; 
