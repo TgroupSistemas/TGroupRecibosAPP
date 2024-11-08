@@ -19,6 +19,7 @@ import {
   updateCorreo,
   getTokenAPI,
   mailUsuario,
+  updateReciboComentario,
   postLog,
   aceptarTYC,
   aceptarVDP,
@@ -66,7 +67,7 @@ export const AppContextProvider = ({ children }) => {
   const [errorAlert, setErrorAlert] = useState("");
 
   const loginUser = useCallback(async (credentials) => {
-    credentials.empresa = "tgroup";
+    credentials.empresa = "croni";
     const jsonArmado = JSON.stringify(credentials);
     const headers = {
       "content-type": "application/json; charset=utf-8",
@@ -226,7 +227,8 @@ export const AppContextProvider = ({ children }) => {
       const idUser = await getCookie("id");
       try {
         const data = await updateCorreo(
-          idUser
+          idUser,
+          await getCookie("fl_erp_empresas"),
         );
         if (data == 200) {
           document.cookie =
@@ -267,7 +269,7 @@ export const AppContextProvider = ({ children }) => {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await mailUsuario(dni);
+      const data = await mailUsuario(dni, await getCookie("fl_erp_empresas"));
       if (data.status == 200) {
         const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
 
@@ -298,7 +300,7 @@ export const AppContextProvider = ({ children }) => {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await datosUsuario(dni);
+      const data = await datosUsuario(dni, await getCookie("fl_erp_empresas"));
       if (data.status == 200) {
         console.log(data, "ASDA");
         return data.datos;
@@ -488,6 +490,29 @@ export const AppContextProvider = ({ children }) => {
           generarHora()
         );
         await postLogRecibo(empresa, estado, id, await getCookie("id"));
+
+        if (data == 200) {
+          setRecibosFirmaLoading(false);
+          console.log(data);
+        } else {
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
+
+  const updateComentarioRecibo = useCallback(
+    
+    async (id, disconformidad, empresa) => {
+      setRecibosFirmaLoading(true);
+      try {
+        const data = await updateReciboComentario(
+          id,
+          disconformidad        );
+        //await postLogRecibo(empresa, estado, id, await getCookie("id"));
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
@@ -702,7 +727,7 @@ export const AppContextProvider = ({ children }) => {
         setVDP,
         getEmpresasHab2,
         vdpCambio,
-
+        updateComentarioRecibo
       }}
     >
       {children}

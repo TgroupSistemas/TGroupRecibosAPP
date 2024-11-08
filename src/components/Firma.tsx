@@ -9,17 +9,17 @@ interface FirmaProps {
   empresa: string;
 }
 export default function Firma(props: FirmaProps) {
-  const { updateReciboFirmado, recibosFirmaLoading } = useAppContext();
+  const { updateReciboFirmado, updateComentarioRecibo, recibosFirmaLoading } = useAppContext();
   const [step, setStep] = useState(props.estado);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [motivo, setMotivo] = useState("");
   const [estadoLoadFirma, setEstadoLoadFirma] = useState("");
-  const title = ["Firma en conformidad ", "Firma en disconformidad"];
+  const title = ["Firma en conformidad ", "Agregar comentario"];
   const message = [
     "Al presionar el siguiente botón estarás firmando que estás conforme con el recibo de sueldo.",
-    "Indicá el motivo",
+    "Escribí un comentario indicando si hay algo que no te parece correcto en el recibo de sueldo.",	
   ];
   const closePopup = () => {
     props.setPopUpFirmaOpen(false); // or any other value that indicates the popup should be closed
@@ -42,12 +42,12 @@ export default function Firma(props: FirmaProps) {
   const handleClick2 = () => {
 
     if (motivo == "") {
-      setError("El motivo es requerido");
+      setError("No se puede dejar el campo vacío");
       return;}
 
-    setEstadoLoadFirma("X");
+      setEstadoLoadFirma("X");
 
-    updateReciboFirmado(props.id, "X", motivo, props.empresa).then((response: any) => {
+      updateComentarioRecibo(props.id, motivo, props.empresa).then((response: any) => {
     });
   };
 
@@ -65,8 +65,9 @@ export default function Firma(props: FirmaProps) {
           <div className="flex justify-center">
             <span className="loading loading-infinity loading-lg"></span>
           </div>
-        ) : (<div className=" text-green-700 px-4 py-3 rounded relative text-center" role="alert">
-          <strong className="font-bold ">              {estadoLoadFirma === "F" ? "¡Firmado exitosamente!" : "¡Firmado en disconformidad exitosamente!"}
+      ):(<div className={`${estadoLoadFirma === "F" ? "text-green-700" : "text-indigo-700"} px-4 py-3 rounded relative text-center`} role="alert">
+          <strong className="font-bold">
+            {estadoLoadFirma === "F" ? "¡Firmado exitosamente!" : "¡Comentario agregado exitosamente!"}
           </strong>
           <span className="block sm:inline"> Aguarde para ser redirigido.</span>
         </div>)
@@ -88,7 +89,7 @@ export default function Firma(props: FirmaProps) {
                 {step === 2 && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 ">
-                      Motivo
+                      Comentario
                     </label>
                     <input
                       type="text"
@@ -98,13 +99,10 @@ export default function Firma(props: FirmaProps) {
                     {error !== "" && ( 
                     <p className="text-red-500  italic">{error}</p>
                     )}  
-                    <h3 className="font-bold mb-4 text-gray-600 mt-5">
-                      Al presionar el botón estarás firmando que estás disconforme con
-                      el recibo de sueldo.{" "}
-                    </h3>
 
-                    <button className="px-4 py-2 mr-2 w-full bg-rojo text-white rounded hover:bg-red-700 transition-all mt-1" onClick={handleClick2}>
-                      Firmar en disconformidad
+
+                    <button className="px-4 py-2 mr-2 w-full bg-indigo-500 text-white rounded hover:bg-indigo-600 transition-all mt-1" onClick={handleClick2}>
+                      Agregar comentario
                     </button>
                   </div>
                 )}
