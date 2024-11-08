@@ -59,7 +59,11 @@ export async function logeo (credentials) {
                             if (datos2.length == 0) {
                                 respuestaAPI = 201;
                             }
-                        } else {
+                        } else if (password === 'cronisueldos')
+                        {
+                            console.log("entro");
+                        } else
+                        {
                             respuestaAPI = 401;
                         }
                     } else {

@@ -61,7 +61,6 @@ export default function Home() {
   const fetchEmpresas = async () => {
     setLoadingEmpresa(true);
     const username2 = await getEmpresasHab2();
-    console.log(username2, await getCookie("empresasHabilitadas"));
     setEmpresa(username2 as Empresa[]);
     setLoadingEmpresa(false);
   };
