@@ -1,5 +1,9 @@
 import React, { useState, useEffect, use } from "react";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { useAppContext } from "@/contexts/AppContext";
 interface mailProps {
   hasPass: boolean;
@@ -30,6 +34,8 @@ export default function MailPassword(props: mailProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);	
   const {
     changePassword,
     ponerMail,
@@ -515,27 +521,57 @@ export default function MailPassword(props: mailProps) {
           )}
           {step === 2 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 ">
+                <label className="block text-sm font-medium text-gray-700 ">
                 Contraseña
-              </label>
-              <input
-                required
-                type="password"
-                id="password"
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-white shadow-sm mb-2 "
-              />
+                </label>
+                <div className="relative">
+                <input
+                  required
+                  id="password"
+                  name="password"
+                  onChange={(e) => setPassword(e.target.value)}
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-white shadow-sm mb-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                >
+                  {showPassword ? (
+                  <FontAwesomeIcon icon={faEye} />
+                  ) : (
+                  <FontAwesomeIcon icon={faEyeSlash} />
+                  )}
+                </button>
+                </div>
 
-              <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700">
                 Confirmar contraseña
-              </label>
-              <input
-                required
-                type="password"
-                id="verificationCode"
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-white shadow-sm mb-2 "
-              />
+                </label>
+                <div className="relative">
+                <input
+                  required
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md bg-white shadow-sm mb-2"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                >
+                  {showConfirmPassword ? (
+                  <FontAwesomeIcon icon={faEye} />
+                  ) : (
+                  <FontAwesomeIcon icon={faEyeSlash} />
+                  )}
+                </button>
+                </div>
               <p className="text-red-500 text-sm mt-2">{error}</p>
 
               <button

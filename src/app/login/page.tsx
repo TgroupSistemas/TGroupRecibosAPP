@@ -2,6 +2,11 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Producto } from "@/app/Modelo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { UpdateTriggerProvider } from "@/app/context"; // Import the UpdateTriggerProvider
 import { useAppContext } from "@/contexts/AppContext";
 import ForgotPassword from "@/components/ForgotPassword";
@@ -19,6 +24,8 @@ export default function Home() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [openForgot, setOpenForgot] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
@@ -101,16 +108,27 @@ export default function Home() {
                   ¿Olvidaste tu contraseña?
                 </button>
               </div>
-              <div className="mt-2">
+                <div className="mt-2 relative">
                 <input
                   id="password"
                   name="password"
                   onChange={(e) => setPassword(e.target.value)}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   className="block bg-white pl-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                >
+                  {showPassword ? (
+                  <FontAwesomeIcon icon={faEye} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  )}
+                </button>
+                </div>
             </div>
             <div className="text-red-500">{}</div>
 
