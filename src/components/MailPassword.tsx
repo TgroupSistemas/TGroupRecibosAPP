@@ -258,155 +258,43 @@ export default function MailPassword(props: mailProps) {
               <div className="max-h-80 overflow-y-auto p-4 border border-gray-300 rounded-md">
                 <p className="text-sm text-gray-600">
                   <span className="font-bold">
-                    TÉRMINOS Y CONDICIONES DE USO DEL PORTAL DE SUELDOS
+                  TÉRMINOS Y CONDICIONES DE USO DEL PORTAL DE SUELDOS
                   </span>
-                  <br />
-                  <br />
-                  1. Objeto de los Términos y Condiciones
-                  <br />
-                  El presente documento tiene como objetivo definir las reglas
-                  que rigen el uso del Portal de Sueldos TGroup por parte de los
-                  empleados de las empresas que contratan este servicio. Al
-                  acceder y utilizar el Portal de Sueldos, usted acepta
-                  plenamente y sin reservas todos los términos y condiciones
-                  aquí establecidos.
-                  <br />
-                  <br />
-                  2. Validez de la Firma Electrónica
-                  <br />
-                  El usuario acepta que la firma electrónica realizada a través
-                  del Portal de Sueldos tiene plena validez legal y es
-                  equivalente a una firma manuscrita. Al firmar electrónicamente
-                  sus recibos de sueldos, usted acepta su contenido y da fe de
-                  que los datos incluidos en dichos recibos son correctos.
-                  TGroup SAS proporciona únicamente el software para la firma
-                  electrónica y no es responsable del contenido de los
-                  documentos firmados a través de la plataforma.
-                  <br />
-                  <br />
-                  En caso de disputa legal sobre la validez de una firma
-                  electrónica, TGroup SAS se compromete a proporcionar toda la
-                  información técnica necesaria que esté a su disposición, a
-                  solicitud de las autoridades competentes. Sin embargo, TGroup
-                  SAS no se hace responsable de las disputas relacionadas con el
-                  contenido de los documentos firmados ni con la relación
-                  laboral entre la empresa y el empleado.
-                  <br />
-                  <br />
-                  3. Registro y Acceso al Portal
-                  <br />
-                  Para acceder al Portal de Sueldos, el empleado deberá
-                  registrarse con su DNI y la contraseña proporcionada por su
-                  empleador. Durante el primer acceso, el sistema le solicitará
-                  la validación de su dirección de correo electrónico, a través
-                  de un código de verificación que será enviado a su casilla de
-                  email.
-                  <br />
-                  <br />
-                  El acceso al Portal es personal e intransferible, siendo el
-                  empleado el único responsable de la seguridad de sus
-                  credenciales. Usted se compromete a mantener su contraseña
-                  segura y a no compartirla con terceros. Cualquier actividad
-                  realizada con su cuenta será de su exclusiva responsabilidad.
-                  <br />
-                  <br />
-                  4. Verificación y Actualización de Datos Personales
-                  <br />
-                  En su primer ingreso al Portal de Sueldos, el empleado deberá
-                  revisar y confirmar la veracidad de sus datos personales. Si
-                  los datos mostrados no son correctos, deberá informar los
-                  cambios necesarios utilizando el formulario de corrección
-                  disponible en la plataforma.
-                  <br />
-                  <br />
-                  Es responsabilidad del empleado mantener sus datos personales
-                  actualizados. En caso de que los datos cambien, el sistema le
-                  mostrará nuevamente la opción de confirmación hasta que los
-                  mismos sean verificados y aceptados.
-                  <br />
-                  <br />
-                  5. Firma de Recibos de Sueldos
-                  <br />
-                  El Portal de Sueldos permite al usuario firmar
-                  electrónicamente sus recibos de sueldos. Existen dos opciones:
-                  <br />
-                  <br />
-                  Firma en Conformidad: El empleado acepta el recibo de sueldos
-                  sin objeciones. Firma en Disconformidad: El empleado podrá
-                  firmar expresando su disconformidad, indicando los motivos que
-                  justifiquen su desacuerdo con los conceptos reflejados en el
-                  recibo. Al firmar un recibo, el siguiente recibo pendiente de
-                  firma se habilitará automáticamente. La firma de un recibo es
-                  un requisito indispensable para poder acceder a la firma de
-                  los siguientes.
-                  <br />
-                  <br />
-                  6. Descarga e Impresión de Recibos
-                  <br />
-                  El usuario tiene la opción de descargar e imprimir sus recibos
-                  de sueldos en formato PDF una vez que estos hayan sido
-                  firmados. Los recibos estarán disponibles en el portal para
-                  ser consultados y descargados en cualquier momento, mientras
-                  la relación laboral continúe vigente y el servicio esté
-                  activo.
-                  <br />
-                  <br />
-                  7. Suspensión o Cancelación del Servicio
-                  <br />
-                  TGroup SAS se reserva el derecho de suspender o cancelar el
-                  acceso al Portal de Sueldos si se detecta alguna irregularidad
-                  en su uso, tales como intentos de fraude, accesos no
-                  autorizados, o incumplimiento de cualquiera de los términos
-                  aquí descritos. En caso de suspensión, el empleado no podrá
-                  acceder al portal hasta que se resuelvan las irregularidades
-                  detectadas.
-                  <br />
-                  <br />
-                  8. Responsabilidad del Usuario
-                  <br />
-                  El usuario es el único responsable de las acciones realizadas
-                  en el Portal de Sueldos utilizando sus credenciales. Cualquier
-                  incumplimiento de las reglas establecidas en estos términos y
-                  condiciones puede derivar en la suspensión o cancelación de su
-                  acceso a la plataforma.
-                  <br />
-                  <br />
-                  9. Exoneración de Responsabilidad
-                  <br />
-                  TGroup SAS no se responsabiliza por los posibles fallos
-                  técnicos, interrupciones del servicio o errores derivados del
-                  uso de la plataforma que sean atribuibles a problemas en la
-                  red de Internet, el hardware o el software del usuario.
-                  Además, TGroup SAS no se hace responsable por la incorrecta
-                  utilización del Portal de Sueldos ni por la imposibilidad de
-                  acceder al mismo debido a causas externas a su control.
-                  <br />
-                  <br />
-                  10. Seguridad y Confidencialidad
-                  <br />
-                  Todas las comunicaciones entre el Portal de Sueldos y el
-                  usuario están protegidas mediante cifrado para garantizar la
-                  confidencialidad de los datos. Sin embargo, es responsabilidad
-                  del empleado adoptar las medidas de seguridad necesarias en su
-                  dispositivo, como la instalación de antivirus o el uso de
-                  firewalls, para proteger sus datos personales y laborales.
-                  <br />
-                  <br />
-                  11. Actualización de los Términos y Condiciones
-                  <br />
-                  TGroup SAS se reserva el derecho de modificar estos términos y
-                  condiciones en cualquier momento. Los cambios entrarán en
-                  vigor una vez publicados en el portal. El uso continuo del
-                  Portal de Sueldos después de la modificación de los términos
-                  constituirá la aceptación de los mismos.
-                  <br />
-                  <br />
-                  12. Aceptación de los Términos
-                  <br />
-                  Al utilizar el Portal de Sueldos TGroup, usted declara haber
-                  leído, comprendido y aceptado en su totalidad estos términos y
-                  condiciones. Si no está de acuerdo con alguna de las
-                  condiciones, deberá abstenerse de utilizar el portal.
+1. Objeto de los Términos y Condiciones
+El presente documento tiene como objetivo definir las reglas que rigen el uso del Portal de Sueldos TGroup por parte de los empleados de las empresas que contratan este servicio. Al acceder y utilizar el Portal de Sueldos, usted acepta plenamente y sin reservas todos los términos y condiciones aquí establecidos.
+<br/><br/>
+2. Validez de la Firma Electrónica
+El usuario acepta que la firma electrónica realizada a través del Portal de Sueldos tiene plena validez legal y es equivalente a una firma manuscrita. Al firmar electrónicamente sus recibos de sueldos, usted acepta su contenido y da fe de que los datos incluidos en dichos recibos son correctos.
+TGroup SAS proporciona únicamente el software para la firma electrónica y no es responsable del contenido de los documentos firmados a través de la plataforma.
+En caso de disputa legal sobre la validez de una firma electrónica, TGroup SAS se compromete a proporcionar toda la información técnica necesaria que esté a su disposición, a solicitud de las autoridades competentes. Sin embargo, TGroup SAS no se hace responsable de las disputas relacionadas con el contenido de los documentos firmados ni con la relación laboral entre la empresa y el empleado.
+<br/><br/>
+3. Registro y Acceso al Portal
+Para acceder al Portal de Sueldos, el empleado deberá registrarse con su DNI y la contraseña proporcionada por su empleador. Durante el primer acceso, el sistema le solicitará la validación de su dirección de correo electrónico, a través de un código de verificación que será enviado a su casilla de email.
+El acceso al Portal es personal e intransferible, siendo el empleado el único responsable de la seguridad de sus credenciales. Usted se compromete a mantener su contraseña segura y a no compartirla con terceros. Cualquier actividad realizada con su cuenta será de su exclusiva responsabilidad.
+<br/><br/>
+*4. Verificación y Actualización de Datos Personales
+En su primer ingreso al Portal de Sueldos, el empleado deberá revisar y confirmar la veracidad de sus datos personales. Si los datos mostrados no son correctos, deberá informar los cambios necesarios utilizando el formulario de corrección disponible en la plataforma.
+Es responsabilidad del empleado mantener sus datos personales actualizados. En caso de que los datos cambien, el sistema le mostrará nuevamente la opción de confirmación hasta que los mismos sean verificados y aceptados.
+<br/><br/>
+5. Firma de Recibos de Sueldos
+El Portal de Sueldos permite al usuario firmar electrónicamente sus recibos de sueldos. 
+Existen dos acciones posibles:
+Firmar: El empleado acepta y firma el recibo de sueldos. 
+Agregar comentario: El empleado podrá agregar los motivos que justifiquen un desacuerdo o pedido de ajuste por  los conceptos reflejados en el recibo. 
+Al firmar un recibo, el siguiente recibo pendiente de firma se habilitará automáticamente. La firma de un recibo es un requisito indispensable para poder acceder a la firma de los siguientes.* 
+<br/><br/>
+6. Descarga e Impresión de Recibos
+El usuario tiene la opción de descargar e imprimir sus recibos de sueldos en formato PDF una vez que estos hayan sido firmados. Los recibos estarán disponibles en el portal para ser consultados y descargados en cualquier momento, mientras la relación laboral continúe vigente y el servicio esté activo.
+<br/><br/>
+7. Suspensión o Cancelación del Servicio
+TGroup SAS se reserva el derecho de suspender o cancelar el acceso al Portal de Sueldos si se detecta alguna irregularidad en su uso, tales como intentos de fraude, accesos no autorizados, o incumplimiento de cualquiera de los términos aquí descritos. En caso de suspensión, el empleado no podrá acceder al portal hasta que se resuelvan las irregularidades detectadas.
+<br/><br/>
+8. Responsabilidad del Usuario
+El usuario es el único responsable de las acciones realizadas en el Portal de Sueldos utilizando sus credenciales. Cualquier incumplimiento de las reglas establecidas en estos términos y condiciones puede derivar en la suspensión o cancelación de su acceso a la plataforma.
+<br/><br/>
+9. Exoneración de Responsabilidad
+TGroup SAS no se responsabiliza por los posibles fallos técnicos, interrupciones del servicio o errores derivados del uso de la plataforma que sean atribuibles a problemas en la red de Internet, el hardware o el software del usuario.
+Además, TGroup SAS no se hace responsable por la incorrecta utilización del Portal de Sueldos ni por la imposibilidad de acceder al mismo debido a causas externas a su control.
                 </p>
               </div>
               <button
