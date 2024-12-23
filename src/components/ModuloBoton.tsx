@@ -4,12 +4,14 @@ import Link from 'next/link';
 
 interface agregarProps {
     empresa: string;
+    nombre: string;
+    direccion: string;
 }
-export default function EmpresaBoton(props: agregarProps) {
+export default function ModuloBoton(props: agregarProps) {
 
 
     return (
-        <Link className="w-full md:w-1/3" href={"/" + props.empresa}>
+        <Link className="w-full md:w-1/3" href={"/" + props.empresa + "/" + props.direccion}>
         <div className="p-4">
           <div className="flex rounded-lg h-full w-full bg-slate-200 p-8 flex-col">
             <div className="flex items-center mb-3">
@@ -27,7 +29,7 @@ export default function EmpresaBoton(props: agregarProps) {
                   <circle cx="12" cy="7" r="4"></circle>
                 </svg>
               </div>
-              <h2 className="text-gray-900 text-lg title-font font-medium">{props.empresa}</h2>
+              <h2 className="text-gray-900 text-lg title-font font-medium">{props.nombre}</h2>
             </div>
             <div className="flex-grow">
               <p className="leading-relaxed text-base">
