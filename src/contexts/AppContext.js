@@ -19,13 +19,17 @@ import {
   updateCorreo,
   getTokenAPI,
   mailUsuario,
+  updateReciboComentario,
   postLog,
   aceptarTYC,
+  aceptarVDP,
   datosUsuario,
+  traerEmpresas,
   traerPDF
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
+import { get } from "http";
 dotenv.config();
 
 const AppContext = createContext();
@@ -57,12 +61,13 @@ export const AppContextProvider = ({ children }) => {
   const [recibosFirmaLoading, setRecibosFirmaLoading] = useState(false);
   const [logLoading, setLogLoading] = useState(false);
   const [tycCambio, setTycCambio] = useState(false);
+  const [vdpCambio, setVdpCambio] = useState(false);
   const [filtroEndpointActualFijoPopUp, setFiltroEndpointActualFijoPopUp] =
     useState("");
   const [errorAlert, setErrorAlert] = useState("");
 
   const loginUser = useCallback(async (credentials) => {
-    credentials.empresa = "tgroup";
+    credentials.empresa = "croni";
     const jsonArmado = JSON.stringify(credentials);
     const headers = {
       "content-type": "application/json; charset=utf-8",
@@ -94,11 +99,14 @@ export const AppContextProvider = ({ children }) => {
           "username=" + await setCookie(data.datos.USERNAME) + "; max-age=28800; path=/";
         document.cookie =
           "mail=" + await setCookie(data.datos.EMAIL) + "; max-age=28800; path=/";
+          const datmail = data.datos.EMAIL_VERIFICADO != null ? data.datos.EMAIL_VERIFICADO.toString() : "false"; // Default to "false" if null or undefined
         document.cookie =
-          "mailverificado=" + await setCookie(data.datos.EMAIL_VERIFICADO.toString()) + "; max-age=28800; path=/";
+          "mailverificado=" + await setCookie(datmail) + "; max-age=28800; path=/";
           const tycValue = data.datos.ACEPTA_TYC != null ? data.datos.ACEPTA_TYC.toString() : "false"; // Default to "false" if null or undefined
           document.cookie =
           "tyc=" + await setCookie(tycValue) + "; max-age=28800; path=/"; 
+          document.cookie =
+          "vdp=" + await setCookie(data.datos.ACEPTA_DP) + "; max-age=28800; path=/"; 
         document.cookie =
           "fk_erp_contactos=" +
           await setCookie(data.datos.FK_ERP_CONTACTOS) +
@@ -131,6 +139,8 @@ export const AppContextProvider = ({ children }) => {
     document.cookie = "fl_erp_empresas=; max-age=0; path=/";
     document.cookie = "elecom_vendedor=; max-age=0; path=/";
     document.cookie = "username=; max-age=0; path=/";
+    document.cookie = "vdp=; max-age=0; path=/";
+
     document.cookie = "fk_erp_contactos=; max-age=0; path=/";
     document.cookie = "menu=; max-age=0; path=/";
     document.cookie = "mailVerificado=; max-age=0; path=/";
@@ -159,10 +169,38 @@ export const AppContextProvider = ({ children }) => {
     if (await await getCookie("empresasHabilitadas") == null) {
       return [];
     }
+
     return (
       await getCookie("empresasHabilitadas")
     );
   }, []);
+
+
+  const getEmpresasHab2 = useCallback(async () => {
+    try {
+        const empresasHabilitadas = await getCookie("empresasHabilitadas");
+        if (empresasHabilitadas == null) {
+            return [];
+        }
+
+        const result = await traerEmpresas(empresasHabilitadas, await getCookie("fl_erp_empresas"));
+
+        // Map through empresasHabilitadas and add the corresponding DESCRIPCION
+        const combinedArray = result.datos.map(item1 => {
+          const matchingItem = JSON.parse(empresasHabilitadas).find(item2 => item2.FK_WS_CLIENTES === item1.CODIGO);
+          if (matchingItem) {
+            const { CODIGO, ...remainingFields } = item1; // Remove CODIGO
+            return { DESCRIPCION: remainingFields.DESCRIPCION, ...matchingItem };
+          }
+          return item1;
+        });
+        return combinedArray;
+    } catch (error) {
+        console.error("Error in getEmpresasHab2:", error);
+        return [];
+    }
+}, []);
+
   const getEmpresaName = useCallback(async () => {
     if (await await getCookie("fl_erp_empresas") == null) {
       return "TGROUP";
@@ -189,7 +227,8 @@ export const AppContextProvider = ({ children }) => {
       const idUser = await getCookie("id");
       try {
         const data = await updateCorreo(
-          idUser
+          idUser,
+          await getCookie("fl_erp_empresas"),
         );
         if (data == 200) {
           document.cookie =
@@ -230,7 +269,7 @@ export const AppContextProvider = ({ children }) => {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await mailUsuario(dni);
+      const data = await mailUsuario(dni, await getCookie("fl_erp_empresas"));
       if (data.status == 200) {
         const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
 
@@ -261,7 +300,7 @@ export const AppContextProvider = ({ children }) => {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await datosUsuario(dni);
+      const data = await datosUsuario(dni, await getCookie("fl_erp_empresas"));
       if (data.status == 200) {
         console.log(data, "ASDA");
         return data.datos;
@@ -296,7 +335,28 @@ export const AppContextProvider = ({ children }) => {
   }, []);
 
 
+  const setVDP = useCallback(async (ver, desc = "") => {
+    const id = await getCookie("id");
+    try {
+      const data = await aceptarVDP(
+        id,
+        await getCookie("fl_erp_empresas"),
+        ver,
+        desc,
+        generarHora()
 
+      );
+
+      if (data.status == 200) {
+        document.cookie = `vdp=${await setCookie(ver)}; max-age=28800; path=/`;
+        setVdpCambio(true);
+      } else {
+        console.log("ERRORRR cambio password");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
 
   //tolis
   const changePassword = useCallback(async (credentials) => {
@@ -430,6 +490,29 @@ export const AppContextProvider = ({ children }) => {
           generarHora()
         );
         await postLogRecibo(empresa, estado, id, await getCookie("id"));
+
+        if (data == 200) {
+          setRecibosFirmaLoading(false);
+          console.log(data);
+        } else {
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
+
+  const updateComentarioRecibo = useCallback(
+    
+    async (id, disconformidad, empresa) => {
+      setRecibosFirmaLoading(true);
+      try {
+        const data = await updateReciboComentario(
+          id,
+          disconformidad        );
+        //await postLogRecibo(empresa, estado, id, await getCookie("id"));
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
@@ -640,7 +723,11 @@ export const AppContextProvider = ({ children }) => {
         recibosFirmados,
         fetchPDF,PDF,PDFLoading,
         mailVerificadoCambio,
-        tycCambio
+        tycCambio,
+        setVDP,
+        getEmpresasHab2,
+        vdpCambio,
+        updateComentarioRecibo
       }}
     >
       {children}

@@ -15,11 +15,10 @@ const config = {
 };
 
 export async function logeo (credentials) {
-    const empresa = credentials.empresa;
     const username = credentials.dni;
     const password = credentials.password;
+    const empresas = ["tgroup", "croni"];
     try {
-      
         let passwordIntocada = password;
         let salt = KEY;
         let respuestaAPI;
@@ -30,30 +29,21 @@ export async function logeo (credentials) {
                 resolve(hash);
             });
         });
-    
-        if (empresa && username) {
-            let sqlFilter = `USERNAME = '${username}' AND FK_WS_CLIENTES= '${empresa}'`;
 
-            /*if (passwordIntocada == "") {
-                sqlFilter += ` AND (PASSWORD = '' OR PASSWORD IS NULL)`;
-            }
-            else{
-                sqlFilter += ` AND PASSWORD = '${pass}'`;
-            }*/
+        for (const empresa of empresas) {
+            if (username) {
+                let sqlFilter = `USERNAME = '${username}' AND FK_WS_CLIENTES= '${empresa}'`;
 
-            const resp = await axios.get(
-                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &&cliente=${empresa}`,
-                config, 
-                )
-            let datos = resp.data;
-            if(datos.length == 0)
-            {
-                respuestaAPI = 201;
-            }
-            else{
-                respuestaAPI = 200;
-                if((datos[0].PASSWORD === '' || datos[0].PASSWORD === null) )
-                    {	
+                const resp = await axios.get(
+                    `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &&cliente=${empresa}`,
+                    config, 
+                );
+                let datos = resp.data;
+                if (datos.length == 0) {
+                    respuestaAPI = 201;
+                } else {
+                    respuestaAPI = 200;
+                    if ((datos[0].PASSWORD === '' || datos[0].PASSWORD === null)) {
                         if (password.includes(';')) {
                             const [part1, part2] = password.split(';');
 
@@ -62,32 +52,34 @@ export async function logeo (credentials) {
                             const resp2 = await axios.get(
                                 `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2}`,
                                 config, 
-                                )
+                            );
                             let datos2 = resp2.data;
                             console.log(datos2);
 
-                            if(datos2.length == 0)
-                                {
-                                    respuestaAPI = 201;
-                                }
-                        }
-                        else
+                            if (datos2.length == 0) {
+                                respuestaAPI = 201;
+                            }
+                        } else if (password === 'cronisueldos')
+                        {
+                            console.log("entro");
+                        } else
                         {
                             respuestaAPI = 401;
                         }
+                    } else {
+                        if (datos[0].PASSWORD == pass) {
+                            // Redirect to home page
+                        } else {
+                            respuestaAPI = 401;
+                        }
+                    }
                 }
-                else{
-                    if(datos[0].PASSWORD == pass){
-
-                        // Redirect to home page
-                    }
-                    else{
-                        respuestaAPI = 401;
-                    }
+                if (respuestaAPI === 200) {
+                    return ({status: respuestaAPI, datos: datos[0]});
                 }
             }
-            return ({status: respuestaAPI, datos: datos[0]});
-        } 
+        }
+        return ({status: respuestaAPI, datos: null});
     } catch (error) {
         console.error(error);
     }
@@ -115,7 +107,7 @@ export async function enviarClase(endpoint, empresa, datosFormularioActual) {
     }
 }
 
-export async function mailUsuario (dni) {
+export async function mailUsuario (dni, empresa) {
     let sqlFilter = `USERNAME = '${dni}'`;
     let respuestaAPI;
     try {
@@ -124,7 +116,7 @@ export async function mailUsuario (dni) {
 
 
             const resp = await axios.get(
-                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=TGROUP&sqlAttributes=EMAIL,ID`,
+                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=${empresa}&sqlAttributes=EMAIL,ID`,
                 config, 
                 )
             let datos = resp.data;
@@ -143,13 +135,13 @@ export async function mailUsuario (dni) {
     }
 };
 
-export async function datosUsuario (dni) {
+export async function datosUsuario (dni, empresa) {
     let sqlFilter = `USERNAME = '${dni}'`;
     let respuestaAPI;
     try {
     
             const resp = await axios.get(
-                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=TGROUP&sqlAttributes=CALLE,CELULARES,CP,CUIL,DEPTO,EMAIL,FULLNAME,LOCALIDAD,NUMERO,PARTIDO,PISO,PROVINCIA,TE`,
+                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=${empresa}&sqlAttributes=CALLE,CELULARES,CP,CUIL,DEPTO,EMAIL,FULLNAME,LOCALIDAD,NUMERO,PARTIDO,PISO,PROVINCIA,TE`,
                 config, 
                 )
             let datos = resp.data;
@@ -234,7 +226,47 @@ export async function aceptarTYC(id, rs) {
         });    }
 
 }
+export async function aceptarVDP(id, rs, ver, desc, hora) {
 
+    if (id && rs) {
+        try {
+            const resp = await axios.put(
+                `${URL}/clases/WS_USUARIOS/${id}?cliente=${rs}`,
+                {
+                    "ACEPTA_DP": ver
+                },
+                config
+            );
+            if(ver == "X")
+            {
+                const resp2 = await axios.post(
+                    `${URL}/clases/WS_NOTIFICACIONES/?cliente=${rs}`,
+                    {
+                        "FK_WS_USUARIOS": id,
+                        "OPERACION": "D",
+                        "NOTAS": desc,
+                        "FECHA_HORA": hora
+                    },
+                    config
+                );
+            }
+
+            return ({ status: 200, datos: resp.data });
+
+
+        } catch (error) {
+            console.error(error);
+            return ({
+                status: error.response ? error.response.status : 500,
+                message: error.response ? error.response.data : error.message
+            });        }
+    } else {
+        return ({
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        });    }
+
+}
 
 export async function traerEndpoint(filtro, parametros, pagina, empresa, endpoint) {
     const sqlFilter = (filtro && parametros) ? `&&sqlFilter=${encodeURIComponent(generateSqlFilter(parametros, filtro))}` : '';
@@ -244,6 +276,32 @@ export async function traerEndpoint(filtro, parametros, pagina, empresa, endpoin
     );
     return ({ status: 200, datos: resp.data });
 };
+function generateSqlFilter2(da) {
+    const data = JSON.parse(da);
+    
+    // Check if the array is valid and not empty
+    if (!data || data.length === 0) {
+        return '';
+    }
+
+    // Extract FK_WS_CLIENTES values
+    const fkWsClientesValues = data.map(empresa => empresa.FK_WS_CLIENTES).filter(value => value);
+
+    // Construct the filter string
+    const filterString = fkWsClientesValues.map(value => `CODIGO LIKE '%${value}%'`).join(' OR ');
+
+    return filterString;
+}
+
+
+export async function traerEmpresas(filtro, empresa) {
+    const sqlFilter = (filtro) ? `&sqlFilter=${encodeURIComponent(generateSqlFilter2(filtro))}` : '';
+    const resp = await axios.get(
+      `${URL}/clases/WS_EMPRESAS_TGR?cliente=tgroup${sqlFilter}`,
+      config
+    );
+    return ({ status: 200, datos: resp.data });
+}
 
 
 export async function getRegistroUnico(id, endpoint, empresa) {
@@ -432,8 +490,26 @@ export const updateRecibo = async (id, estadoFirma, disconformidad, FECHA_ESTADO
     }
 };
 
-export const updateCorreo = async (id) => {
-    const url = `${URL}/clases/WS_USUARIOS/${id}?cliente=TGROUP`;
+export const updateReciboComentario = async (id, disconformidad) => {
+    const url = `${URL}/clases/WS_RECIBOS/${id}`;
+    const data = {
+        MOTIVO_DISCONFORMIDAD: disconformidad
+    };
+
+    try {
+        const response = await axios.put(url, data, config);
+        return response.status;
+    } catch (error) {
+        console.error(error);
+        return {
+            status: error.response ? error.response.status : 500,
+            message: error.response ? error.response.data : error.message
+        };
+    }
+};
+
+export const updateCorreo = async (id, empresa) => {
+    const url = `${URL}/clases/WS_USUARIOS/${id}?cliente=${empresa}`;
     const data = {  
         EMAIL_VERIFICADO: true
     };

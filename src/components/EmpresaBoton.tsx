@@ -4,12 +4,13 @@ import Link from 'next/link';
 
 interface agregarProps {
     empresa: string;
+    destino: string;
 }
 export default function EmpresaBoton(props: agregarProps) {
 
 
     return (
-        <Link className="w-full md:w-1/3" href={"/" + props.empresa}>
+        <Link className="w-full md:w-1/3" href={"/" + props.destino}>
         <div className="p-4">
           <div className="flex rounded-lg h-full w-full bg-slate-200 p-8 flex-col">
             <div className="flex items-center mb-3">

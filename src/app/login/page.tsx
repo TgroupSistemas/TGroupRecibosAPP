@@ -2,6 +2,11 @@
 import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { Producto } from "@/app/Modelo";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEye,
+  faEyeSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { UpdateTriggerProvider } from "@/app/context"; // Import the UpdateTriggerProvider
 import { useAppContext } from "@/contexts/AppContext";
 import ForgotPassword from "@/components/ForgotPassword";
@@ -17,20 +22,24 @@ export default function Home() {
   const [dni, setDNI] = useState<string>("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [openForgot, setOpenForgot] = useState(false);
-  const [loadingLog, setLoadingLog] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const handleSubmit = async (
     e: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
-    setLoadingLog(true);
     e.preventDefault();
+    setLoading(true);
+
     const response = await loginUser({
       dni, // Make sure to use the state variables here
       password,
     });
 
     if (!response) {
-      setLoadingLog(false);
+      setLoading(false);
+
       setError(
         "Error al iniciar sesión. Por favor, verifique los datos ingresados."
       );
@@ -79,8 +88,6 @@ export default function Home() {
                   name="dni"
                   type="number"
                   onChange={(e) => setDNI(e.target.value)}
-                  disabled={logLoading ? true : false}
-
                   required
                   className="block  w-full rounded-md border-0 py-1.5 bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
@@ -102,17 +109,27 @@ export default function Home() {
                   ¿Olvidaste tu contraseña?
                 </button>
               </div>
-              <div className="mt-2">
+                <div className="mt-2 relative">
                 <input
                   id="password"
                   name="password"
                   onChange={(e) => setPassword(e.target.value)}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  disabled={logLoading ? true : false}
                   className="block bg-white pl-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
+                >
+                  {showPassword ? (
+                  <FontAwesomeIcon icon={faEye} />
+                  ) : (
+                    <FontAwesomeIcon icon={faEyeSlash} />
+                  )}
+                </button>
+                </div>
             </div>
             <div className="text-red-500">{}</div>
 
@@ -121,17 +138,20 @@ export default function Home() {
             <div>
               <button
                 type="submit"
-                className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                disabled={loading}
+                className={`flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 ${
+                  loading ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-500 focus-visible:outline-indigo-600'
+                }`}
               >
-                {" "}
-                {loadingLog ? (
-                  <span className="loading loading-infinity loading-md"></span>
-                ) : (
-                  "Acceder"
-                )}
+                Acceder
               </button>
             </div>
           </form>
+          {loading && (
+            <div className="flex justify-center">
+              <span className="loading loading-infinity loading-lg"></span>
+            </div>
+          )}
         </div>
       </div>
       {openForgot && (
