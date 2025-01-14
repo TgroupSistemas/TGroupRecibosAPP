@@ -25,8 +25,20 @@ export default function Home() {
       DIRECCION: "licencias",
     }*/
   ];
-  let empresa = "TGROUP"
-  return (
+
+  const [empresa, setEmpresa] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setEmpresa(window.location.pathname.split('/')[1]);
+    }
+  }, []);
+
+  if (!empresa) {
+    return null; // or a loading spinner
+  }
+
+    return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>
       <section className="pt-40 md:pt-20">
