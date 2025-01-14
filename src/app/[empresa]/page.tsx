@@ -25,7 +25,10 @@ export default function Home() {
       DIRECCION: "licencias",
     }
   ];
-  let empresa = "TGROUP"
+  
+  const empresa = window.location.pathname
+          .replace("/", "")
+          .split("/")[0];
   return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>

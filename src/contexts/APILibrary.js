@@ -380,7 +380,7 @@ export async function getRecibos(id, empresa, firmados, page) {
                 `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC&page=${page}`,
                 config
             );
-            console.log("recibo", resp.data);
+            console.log("recibo", resp.data, `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(empresa)}&sqlOrderBy=PERIODO ASC&page=${page}`);
             return ({ status: 200, datos: resp.data });
 
         } catch (error) {
