@@ -38,12 +38,12 @@ export default function Navbar() {
                 name.split(" ")[0].charAt(0).toUpperCase() +
                 name.split(" ")[0].slice(1).toLowerCase()}
             </li>
-            <Link
+            {/* <Link
               href="/notificaciones"
               className="block text-center px-2 text-lg no-underline verdetg font-semibold"
             >
               <FontAwesomeIcon icon={faBell} className="mr-2" />
-            </Link>
+            </Link> */}
             <div className="flex mt-2 md:mt-0">
             <Link
               href="/perfil"
