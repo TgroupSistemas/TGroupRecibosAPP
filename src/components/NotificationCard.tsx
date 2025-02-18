@@ -21,13 +21,17 @@ interface Recibo {
 interface NotificationCardProps {
   //recibo: Recibo;
   index: number;
+  notificacion: any;
   /*set: React.Dispatch<React.SetStateAction<Recibo>>;
   set2: React.Dispatch<React.SetStateAction<boolean>>;
   habilitada: boolean;
   empresa: string;*/
 }
 
-const NotificationCard: React.FC<NotificationCardProps> = ({ index }) => {
+const NotificationCard: React.FC<NotificationCardProps> = ({
+  index,
+  notificacion,
+}) => {
   const { postLogRecibo, getCookie } = useAppContext();
   const handleClick = async () => {};
 
@@ -39,11 +43,15 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ index }) => {
       className={`flex  items-center bg-gray-200 md:h-24 h-32 rounded-xl mb-2 pr-4`}
     >
       <div className={cardClassSide}>
-      12/12/24
-      
+        {new Date(notificacion.FECHA_HORA).toLocaleDateString()}
       </div>
       <div className=" md:flex md:justify-between md:w-full pl-4 md:pl-6 md:items-center ">
-        <div className="text-black font-bold mb-5 md:mb-0">El Viernes 21/12 vengan todos con corbata</div>
+        <div className="text-black font-bold mb-5 md:mb-0">
+          {notificacion.NOTAS.trim().substring(
+            notificacion.NOTAS.trim().indexOf("<p>") + 3,
+            notificacion.NOTAS.trim().indexOf("</p>")
+          )}
+        </div>{" "}
         <div className="flex space-x-2 ">
           <button
             className={`btn border-none btn-primary text-white w-36  bg-slate-500 hover:bg-slate-600 `}

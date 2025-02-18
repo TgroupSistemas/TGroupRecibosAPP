@@ -8,6 +8,17 @@ import { useAppContext } from "@/contexts/AppContext";
 import NotificationCard from "@/components/NotificationCard";
 
 export default function Home() {
+    const {
+      traerNotificacionesUser,
+      loadingNotificaciones,
+    } = useAppContext();
+    const [notificaciones, setNotificaciones] = useState([]);
+    useEffect(() => {
+      const fetchData = async () => {
+        setNotificaciones(await traerNotificacionesUser());
+      };
+      fetchData();
+    }, []);
   return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>
@@ -17,11 +28,15 @@ export default function Home() {
             <h1 className="sm:text-3xl text-2xl mb-10 font-medium title-font text-gray-900">
               Notificaciones
             </h1>
+            {!loadingNotificaciones && (
             <div className="flex justify-center">
               <div className="w-1/2">
-                <NotificationCard index={1}></NotificationCard>
+              {notificaciones.map((notificacion, index) => (
+                <NotificationCard key={index} index={index} notificacion={notificacion} />
+              ))}
+              </div>
             </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

@@ -25,11 +25,15 @@ import {
   aceptarVDP,
   datosUsuario,
   traerEmpresas,
-  traerPDF
+  traerPDF,
+  postLicencia,
+  traerNotificaciones,
+  uploadFile
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
 import { get } from "http";
+import { env } from "process";
 dotenv.config();
 
 const AppContext = createContext();
@@ -269,7 +273,7 @@ export const AppContextProvider = ({ children }) => {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await mailUsuario(dni, await getCookie("fl_erp_empresas"));
+      const data = await mailUsuario(dni);
       if (data.status == 200) {
         const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
 
@@ -305,6 +309,28 @@ export const AppContextProvider = ({ children }) => {
         console.log(data, "ASDA");
         return data.datos;
     
+
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
+  const [loadingNotificaciones, setLoadingNotificaciones] = useState(false);
+  const traerNotificacionesUser = useCallback(async () => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      setLoadingNotificaciones(true);
+      const data = await traerNotificaciones(await getCookie("id"), 1, await getCookie("fl_erp_empresas"));
+      if (data.status == 200) {
+        console.log(data, "ASDA");
+        setLoadingNotificaciones(false);
+        return data.datos;
+        
 
       } else {
         return false;
@@ -526,6 +552,23 @@ export const AppContextProvider = ({ children }) => {
     },
     []
   );
+  const [imagenLoading, setImagenLoading] = useState(false);
+  const enviarImagen = useCallback(
+    async (archivo, descrip) => {
+      setImagenLoading(true);
+      try {
+        const token = await getTokenAPI("tgroup");
+        const data = await uploadFile(token.datos[0].GCS_TOKEN, archivo);
+          const titulo = descrip + "|" + data.name + "|"
+          setImagenLoading(false);
+          console.log("a", data, titulo);
+          return titulo;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
 
   const postLogRecibo = useCallback(
     //L|Login|D|Descarga recibo|F|Firma ok recibo|X|Firma disconforme recibo
@@ -543,6 +586,42 @@ export const AppContextProvider = ({ children }) => {
         );
         if (data == 200) {
           setLogLoading(false);
+          console.log(data);
+        } else {
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
+  const [licenciaLoading, setLicenciaLoading] = useState(false);
+  const licenciaPost = useCallback(
+    async (licenciaData) => {
+      setLicenciaLoading(true);
+
+        const FK_WS_USUARIOS = await getCookie("id");
+        const FK_WS_CLIENTES = await getCookie("fl_erp_empresas");
+      
+      try {
+        console.log(licenciaData);
+        const data = await postLicencia(
+          {
+          FK_WS_USUARIOS,
+          TIPO_LIC: licenciaData.tipoLicencia,
+          OPERACION: "L",
+          NOTAS: licenciaData.notas,
+          FEC_HAS: licenciaData.selectionRange.endDate.toISOString(),
+          FEC_DES: licenciaData.selectionRange.startDate.toISOString(),
+          FK_WS_CLIENTES,
+          CANTIDAD: licenciaData.daysCount,
+          FECHA_HORA: generarHora(),
+          ARCHIVOS: licenciaData.ARCHIVOS
+          }
+        );
+        if (data == 200) {
+          setLicenciaLoading(false);
           console.log(data);
         } else {
           console.log("ERRORRR recibos");
@@ -726,8 +805,13 @@ export const AppContextProvider = ({ children }) => {
         tycCambio,
         setVDP,
         getEmpresasHab2,
+        loadingNotificaciones,
         vdpCambio,
-        updateComentarioRecibo
+        updateComentarioRecibo,
+        licenciaPost,
+        traerNotificacionesUser,
+        enviarImagen,
+        imagenLoading,
       }}
     >
       {children}
