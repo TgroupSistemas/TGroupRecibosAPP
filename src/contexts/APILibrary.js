@@ -107,34 +107,27 @@ export async function enviarClase(endpoint, empresa, datosFormularioActual) {
     }
 }
 
-export async function mailUsuario (dni, empresa) {
-    let sqlFilter = `USERNAME = '${dni}'`;
-    let respuestaAPI;
+export async function mailUsuario(dni, empresan) {
+  let sqlFilter = `USERNAME = '${dni}'`;
+  let respuestaAPI;
+  const empresas = ["TGROUP", "CRONI"];
+  for (const empresa of empresas) {
     try {
-      
-
-
-
-            const resp = await axios.get(
-                `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=${empresa}&sqlAttributes=EMAIL,ID`,
-                config, 
-                )
-            let datos = resp.data;
-            if(datos.length == 0)
-            {
-                respuestaAPI = 201;
-            }
-            else{
-                respuestaAPI = 200;
-                
-            return ({status: respuestaAPI, datos: datos[0]});
-        } 
-        return ({status: 201});
+      const resp = await axios.get(
+        `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=${empresa}&sqlAttributes=EMAIL,ID`,
+        config
+      );
+      let datos = resp.data;
+      if (datos.length > 0) {
+        respuestaAPI = 200;
+        return { status: respuestaAPI, datos: datos[0] };
+      }
     } catch (error) {
-        console.error(error);
+      console.error(error);
     }
-};
-
+  }
+  return { status: 201 };
+}
 export async function datosUsuario (dni, empresa) {
     let sqlFilter = `USERNAME = '${dni}'`;
     let respuestaAPI;
