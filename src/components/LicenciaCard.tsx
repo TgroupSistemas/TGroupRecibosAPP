@@ -31,7 +31,7 @@ interface NotificationCardProps {
   setNotiEstado: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const NotificationCard: React.FC<NotificationCardProps> = ({
+const LicenciaCard: React.FC<NotificationCardProps> = ({
   index,
   notificacion,
   setNotiAbierta,
@@ -55,10 +55,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
       </div>
       <div className=" md:flex md:justify-between md:w-full pl-4 md:pl-6 md:items-center ">
         <div className="text-black font-bold mb-5 md:mb-0">
-          {notificacion.NOTAS.trim().substring(
-            notificacion.NOTAS.trim().indexOf("<p>") + 3,
-            notificacion.NOTAS.trim().indexOf("</p>")
-          )}
+          {notificacion.TIPO_LIQ}
         </div>{" "}
         <div className="flex space-x-2 ">
           <button
@@ -74,4 +71,4 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   );
 };
 
-export default NotificationCard;
+export default LicenciaCard;

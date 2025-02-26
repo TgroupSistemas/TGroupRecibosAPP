@@ -30,7 +30,9 @@ const Home = () => {
   const [tipoLicencia, setTipoLicencia] = useState("V");
   const [archivos, setArchivos] = useState<File[]>([]);
   const [daysCount, setDaysCount] = useState(1);
-  const { licenciaPost, enviarImagen, imagenLoading } = useAppContext();
+  const [errorsito, setError] = useState("")
+  const { licenciaPost, enviarImagen, imagenLoading, getCookie } = useAppContext();
+  const [loading, setLoading] = useState(false);
   const [selectionRange, setSelectionRange] = useState({
     startDate: new Date(),
     endDate: new Date(),
@@ -40,15 +42,24 @@ const Home = () => {
   const handleAddPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files) return;
-
-    const newPhotos: Photo[] = Array.from(files).map((file) => ({
-      id: URL.createObjectURL(file), // Generate a unique URL for preview
-      file,
-      description: "",
-      type: file.type.startsWith("image") ? "image" : "pdf",
-    }));
+  
+    const newPhotos: Photo[] = Array.from(files).map((file) => {
+      const newFileName = `${Date.now()}.${file.name.split('.').pop()}`; // Genera un nuevo nombre
+  
+      const renamedFile = new File([file], newFileName, { type: file.type });
+  
+      return {
+        id: URL.createObjectURL(renamedFile), // Generar una URL para vista previa
+        file: renamedFile,
+        description: "",
+        type: renamedFile.type.startsWith("image") ? "image" : "pdf",
+      };
+    });
+  
+    console.log(newPhotos);
     setPhotos((prev) => [...prev, ...newPhotos]);
   };
+  
   const handleDeletePhoto = (id: string) => {
     setPhotos((prev) => prev.filter((photo) => photo.id !== id));
   };
@@ -67,39 +78,80 @@ const Home = () => {
   const handleFileRemove = (index: number) => {
     setArchivos(archivos.filter((_, i) => i !== index));
   };
+  const irAVerLicencias = async () => {
+    const empresa = await getCookie("fl_erp_empresas");
+    window.location.replace("/" + empresa + "/licencias/ver");
+  }
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Call your API with the form data
-    const photosNames = [];
-    for (const photo of photos) {
-      photosNames.push(await enviarImagen(photo.file, photo.description));
+    try {
+      // Call your API with the form data
+      setLoading(true);
+      const photosNames = [];
+      for (const photo of photos) {
+        const foto = await enviarImagen(photo.file, photo.description);
+        if (foto.status === 200) {
+          photosNames.push(foto.titulo);
+        } else {
+          setError("Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.");
+          setLoading(false);
+          return;
+        }
+
+      }
+      let concatPhotos = "";
+      for (const photoName of photosNames) {
+        concatPhotos += photoName; 
+      }
+      const formData = {
+        selectionRange,
+        notas,
+        tipoLicencia,
+        photos,
+        daysCount,
+        ARCHIVOS: concatPhotos,
+      };
+      const result = await licenciaPost(formData);
+      if (result === 200) {
+        setLoading(false);
+        setError("Formulario enviado correctamente.");
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      }
+      else {
+        setLoading(false);
+        setError("Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo.");
+      }
+      console.log(formData);
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
-    let concatPhotos = "";
-    for (const photoName of photosNames) {
-      concatPhotos += photoName; 
-    }
-    const formData = {
-      selectionRange,
-      notas,
-      tipoLicencia,
-      photos,
-      daysCount,
-      ARCHIVOS: concatPhotos,
-    };
-    licenciaPost(formData);
-    console.log(formData);
   };
 
   return (
     <UpdateTriggerProvider>
       <Navbar />
       <section className="pt-40 md:pt-20">
+
+            
         <div className="container mx-auto flex justify-center  bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg">
+
           <form onSubmit={handleSubmit} className="">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={() => irAVerLicencias()}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+            >
+              Tus Licencias
+            </button>
+          </div>
             <h1 className="text-2xl font-bold mb-5 text-slate-700 text-center">
               Solicitud de Licencia
             </h1>
+          
 
             <div className="flex ">
               <div className=" mr-10">
@@ -217,9 +269,21 @@ const Home = () => {
                 </div>
               </div>
             </div>
+            {loading ? (
+              <div className="flex justify-center">
+              <span className="loading loading-infinity loading-lg"></span>
+            </div>
+            ) : (
+              errorsito && (
+                <div className={`mt-4 p-4 border rounded-md ${errorsito === "Formulario enviado correctamente." ? "bg-green-100 border-green-400 text-green-700" : "bg-red-100 border-red-400 text-red-700"}`}>
+                  <h2 className="text-center font-semibold">{errorsito}</h2>
+                </div>
+              )
+            )}
             <div className="flex justify-center mt-5">
               <button
                 type="submit"
+                disabled={loading}
                 className="px-12 py-2  bg-blue-500 text-white rounded-2xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Enviar

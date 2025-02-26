@@ -6,12 +6,14 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import NotificationCard from "@/components/NotificationCard";
-
+import PopUpNotification from "@/components/PopUpNotification";
 export default function Home() {
     const {
       traerNotificacionesUser,
       loadingNotificaciones,
     } = useAppContext();
+    const [notiAbierta, setNotiAbierta] = useState(-1);
+    const [notiEstado, setNotiEstado] = useState(false);
     const [notificaciones, setNotificaciones] = useState([]);
     useEffect(() => {
       const fetchData = async () => {
@@ -32,7 +34,7 @@ export default function Home() {
             <div className="flex justify-center">
               <div className="w-1/2">
               {notificaciones.map((notificacion, index) => (
-                <NotificationCard key={index} index={index} notificacion={notificacion} />
+                <NotificationCard key={index} index={index} notificacion={notificacion} setNotiAbierta={setNotiAbierta} setNotiEstado={setNotiEstado} />
               ))}
               </div>
             </div>
@@ -40,6 +42,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {notiEstado &&  
+      <PopUpNotification notificacionArray={notificaciones} setNotiEstado={setNotiEstado} notiAbierta={notiAbierta}  />}
     </UpdateTriggerProvider>
   );
 }

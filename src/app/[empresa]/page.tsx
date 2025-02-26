@@ -12,9 +12,9 @@ import { useAppContext } from "@/contexts/AppContext";
 import ModuloBoton from "@/components/ModuloBoton";
 
 export default function Home() {
-  /*const {
-    modulosAccesibles,
-  } = useAppContext();*/
+  const { getCookie } = useAppContext();
+  const [empresa, setEmpresa] = useState<string >("");
+  const [loadingEmpresa, setLoadingEmpresa] = useState(true);
   const modulosAccesibles = [
     {
       NOMBRE: "Recibos",
@@ -25,10 +25,17 @@ export default function Home() {
       DIRECCION: "licencias",
     }
   ];
-  
-  const empresa = window.location.pathname
-          .replace("/", "")
-          .split("/")[0];
+
+  useEffect(() => {
+    const fetchEmpresa = async () => {
+      setLoadingEmpresa(true);
+      const empresa = await getCookie("fl_erp_empresas");
+      setEmpresa(empresa);
+      setLoadingEmpresa(false);
+    };
+    fetchEmpresa();
+  }, [getCookie]);
+
   return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>
@@ -38,7 +45,7 @@ export default function Home() {
               Modulos
             </h1>
           <div className="flex flex-wrap -m-4 ">
-            {/*!loadingEmpresa &&*/
+            {!loadingEmpresa &&
               modulosAccesibles.map(
                 (item, index) => (
                   (<ModuloBoton key={index} empresa={empresa} nombre={item.NOMBRE} direccion={item.DIRECCION}  />)

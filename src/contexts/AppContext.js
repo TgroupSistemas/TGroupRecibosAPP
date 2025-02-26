@@ -28,7 +28,8 @@ import {
   traerPDF,
   postLicencia,
   traerNotificaciones,
-  uploadFile
+  uploadFile,
+  traerLicencias
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
@@ -340,6 +341,30 @@ export const AppContextProvider = ({ children }) => {
       return false;
     }
   }, []);
+  const [loadingLicencias, setLoadingLicencias] = useState(false);
+
+  const traerLicenciaUser = useCallback(async () => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      setLoadingLicencias(true);
+      const data = await traerLicencias(await getCookie("id"), 1, await getCookie("fl_erp_empresas"));
+      if (data.status == 200) {
+        console.log(data, "ASDA");
+        setLoadingLicencias(false);
+        return data.datos;
+        
+
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
+
 
   const aceptarTerminos = useCallback(async () => {
     const id = await getCookie("id");
@@ -562,8 +587,9 @@ export const AppContextProvider = ({ children }) => {
           const titulo = descrip + "|" + data.name + "|"
           setImagenLoading(false);
           console.log("a", data, titulo);
-          return titulo;
+          return {titulo, status: 200};
       } catch (error) {
+        return 300;
         console.error(error);
       }
     },
@@ -620,13 +646,18 @@ export const AppContextProvider = ({ children }) => {
           ARCHIVOS: licenciaData.ARCHIVOS
           }
         );
-        if (data == 200) {
+        console.log(data);
+        if (data.status == 200) {
           setLicenciaLoading(false);
+          return 200;
           console.log(data);
         } else {
+          console.log("ke")
+          return 300;
           console.log("ERRORRR recibos");
         }
       } catch (error) {
+        return 300;
         console.error(error);
       }
     },
@@ -812,6 +843,8 @@ export const AppContextProvider = ({ children }) => {
         traerNotificacionesUser,
         enviarImagen,
         imagenLoading,
+        traerLicenciaUser,
+        licenciaLoading,
       }}
     >
       {children}

@@ -305,6 +305,17 @@ export async function traerNotificaciones(FK_WS_USUARIOS, pagina, empresa) {
   return { status: 200, datos: resp.data };
 }
 
+export async function traerLicencias(FK_WS_USUARIOS, pagina, empresa) {
+    //https://webapp.tgroup.com.ar/webapp/clases/Ws_NOTIFICACIONES?cliente=TGROUP&sqlFilter=FK_WS_USUARIOS = '3076d266-6b7c-41d6-b3cf-24b1f224c9aa' AND OPERACION = 'E'
+    const resp = await axios.get(
+      `${URL}/clases/Ws_NOTIFICACIONES?cliente=${empresa}&&sqlFilter=FK_WS_USUARIOS = '${FK_WS_USUARIOS}' AND OPERACION = 'L'${
+        pagina ? `&page=${pagina}` : ""
+      }`,
+      config
+    );
+    return { status: 200, datos: resp.data };
+  }
+
 function generateSqlFilter2(da) {
   const data = JSON.parse(da);
 
