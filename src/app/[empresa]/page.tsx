@@ -19,11 +19,11 @@ export default function Home() {
     {
       NOMBRE: "Recibos",
       DIRECCION: "recibos",
-    },
+    }/*,
     {
       NOMBRE: "Licencias",
       DIRECCION: "licencias",
-    }
+    }*/
   ];
 
   useEffect(() => {
