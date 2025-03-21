@@ -39,16 +39,19 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
 }) => {
   const { postLogRecibo, getCookie } = useAppContext();
   const handleClick = async () => {
+    notificacion.ESTADO = "L";
     setNotiAbierta(index);
     setNotiEstado(true);
   };
 
   const cardClassName = `btn border-none text-white   w-28  "bg-slate-500"`;
-  const cardClassSide = ` text-white font-semibold text-sm md:text-base h-full rounded-l-xl flex w-36 md:w-36 p-2 text-center justify-center items-center bg-slate-500 `;
+  const cardClassSide = `text-white font-semibold text-sm md:text-base h-full rounded-l-xl flex w-20 md:w-36 p-2 text-center justify-center items-center ${
+    notificacion.ESTADO === "L" ? "bg-slate-500" : "bg-grisclaro2"
+  }`;
   return (
     <div
       key={index}
-      className={`flex  items-center bg-gray-200 md:h-24 h-32 rounded-xl mb-2 pr-4`}
+      className={`flex  items-center bg-gray-200 md:h-24 h-40 rounded-xl mb-2 pr-4`}
     >
       <div className={cardClassSide}>
         {new Date(notificacion.FECHA_HORA).toLocaleDateString()}
@@ -61,13 +64,15 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
           )}
         </div>{" "}
         <div className="flex space-x-2 ">
-          <button
-            className={`btn border-none btn-primary text-white w-36  bg-slate-500 hover:bg-slate-600 `}
-            onClick={handleClick}
-            disabled={false}
-          >
-            Leer detalle
-          </button>
+              <button
+              className={`btn border-none text-white w-36 rounded-lg shadow-md transition-all duration-300 ease-in-out transform hover:scale-105 ${
+                notificacion.ESTADO === "L" ? "bg-slate-500 hover:bg-slate-600" : "bg-grisclaro2 hover:bg-grisclaro"
+              }`}
+              onClick={handleClick}
+              disabled={false}
+              >
+              Leer detalle
+              </button>
         </div>
       </div>
     </div>

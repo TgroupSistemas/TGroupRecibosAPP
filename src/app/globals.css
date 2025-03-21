@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-date-range .rdrSelected {
+  background-color: #50bbb0 !important; /* Blue for selected dates */
+}
+
+.custom-date-range .rdrInRange {
+  background-color: #50bbb0 !important; /* Light blue for range */
+}
+
+.custom-date-range .rdrEndEdge {
+  background-color: #47a79d !important; /* Dark blue for end edge */
+}
+
+.custom-date-range .rdrStartEdge {
+    background-color: #47a79d !important; /* Dark blue for end edge */
+  }

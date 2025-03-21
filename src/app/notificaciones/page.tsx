@@ -32,7 +32,7 @@ export default function Home() {
             </h1>
             {!loadingNotificaciones && (
             <div className="flex justify-center">
-              <div className="w-1/2">
+              <div className="lg:w-1/2">
               {notificaciones.map((notificacion, index) => (
                 <NotificationCard key={index} index={index} notificacion={notificacion} setNotiAbierta={setNotiAbierta} setNotiEstado={setNotiEstado} />
               ))}

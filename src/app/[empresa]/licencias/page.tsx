@@ -44,7 +44,7 @@ const Home = () => {
     if (!files) return;
   
     const newPhotos: Photo[] = Array.from(files).map((file) => {
-      const newFileName = `${Date.now()}.${file.name.split('.').pop()}`; // Genera un nuevo nombre
+      const newFileName = `${Date.now()}-${Math.floor(Math.random() * 10000)}.${file.name.split('.').pop()}`; // Genera un nuevo nombre con un número aleatorio
   
       const renamedFile = new File([file], newFileName, { type: file.type });
   
@@ -143,7 +143,7 @@ const Home = () => {
             <button
               type="button"
               onClick={() => irAVerLicencias()}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-4 py-2 bg-verdegris text-white md>my-0 my-5 rounded-lg hover:bg-grisclaro focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
               Tus Licencias
             </button>
@@ -153,8 +153,8 @@ const Home = () => {
             </h1>
           
 
-            <div className="flex ">
-              <div className=" mr-10">
+            <div className="flex flex-col md:flex-row gap-10">
+              <div className="md:mx-0 md:mr-10 mx-5 ">
                 <div className="mb-5 ">
                   <label>Tipo de Licencia:</label>
                   <select
@@ -192,80 +192,103 @@ const Home = () => {
                 <div className="mt-3">
                   <label>Archivos:</label>
                     <div className="flex flex-wrap flex-col w-80 gap-4 w-full pt-2">
-                    {photos.map((photo) => (
-                      <div
-                      key={photo.id}
-                      className="relative rounded-lg w-24 h-24 border-2 border-gray-300 overflow-hidden flex w-full"
-                      >
-                      <div className="relative w-24 h-30">
-                        {photo.type === "image" ? (
-                        <Image
-                          src={photo.id}
-                          alt="Uploaded"
-                          width={300}
-                          height={300}
-                          objectFit="cover"
-                        />
-                        ) : (
-                        <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
-                          <Viewer fileUrl={photo.id} />
-                        </Worker>
-                        )}
-                      </div>
-                      <div className="p-2 pt-0 flex flex-col w-full">
-                        <label className="mt-2">Descripción:</label>
-                        <input
-                        type="text"
-                        required
-                        value={photo.description}
+                      {photos.map((photo) => (
+                        <div
+                          key={photo.id}
+                          className="relative rounded-lg w-24 h-24 border-2 border-gray-300 overflow-hidden flex w-full"
+                        >
+                          <div className="relative w-24 h-30">
+                            {photo.type === "image" ? (
+                              <Image
+                                src={photo.id}
+                                alt="Uploaded"
+                                width={300}
+                                height={300}
+                                objectFit="cover"
+                              />
+                            ) : (
+                              <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+                                <Viewer fileUrl={photo.id} />
+                              </Worker>
+                            )}
+                          </div>
+                          <div className="p-2 pt-0 flex flex-col w-full">
+                            <label className="mt-2">Descripción:</label>
+                            <input
+                              type="text"
+                              required
+                              value={photo.description}
+                              onChange={(e) => {
+                                const updatedPhotos = photos.map((p) =>
+                                  p.id === photo.id ? { ...p, description: e.target.value } : p
+                                );
+                                setPhotos(updatedPhotos);
+                              }}
+                              className="w-30 p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
+                            />
+                          </div>
+                          <button
+                            onClick={() => handleDeletePhoto(photo.id)}
+                            className="absolute -top-0 -right-0 bg-red-500 text-white rounded-bl-lg rounded-tr-sm rounded-tl-none rounded-br-none w-6 h-6 flex items-center justify-center text-sm font-bold hover:bg-red-600"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                        <label
+                        htmlFor="photo-upload"
+                        className="w-full h-16 rounded-md bg-gris border-2 border-dashed border-grisclaro flex items-center justify-center cursor-pointer hover:bg-gray-200 transition-transform duration-300 ease-in-out transform"
+                        >
+                        <span className="text-grisclaro text-lg font-bold">
+                          Agregar archivo
+                        </span>
+                        </label>
+                      <input
+                        type="file"
+                        id="photo-upload"
+                        accept="image/*,application/pdf"
+                        multiple
+                        className="hidden"
                         onChange={(e) => {
-                          const updatedPhotos = photos.map((p) =>
-                          p.id === photo.id
-                            ? { ...p, description: e.target.value }
-                            : p
-                          );
-                          setPhotos(updatedPhotos);
+                          const files = e.target.files;
+                          if (!files) return;
+
+                          const newPhotos: Photo[] = Array.from(files).map((file) => {
+                            setError("");
+                            if (file.size > 2 * 1024 * 1024) {
+                              setError("El archivo no debe superar los 2MB");
+                              return null;
+                            }
+
+                            const newFileName = `${Date.now()}-${Math.floor(Math.random() * 10000)}.${file.name.split('.').pop()}`;
+                            const renamedFile = new File([file], newFileName, { type: file.type });
+
+                            return {
+                              id: URL.createObjectURL(renamedFile),
+                              file: renamedFile,
+                              description: "",
+                              type: renamedFile.type.startsWith("image") ? "image" : "pdf",
+                            };
+                          }).filter(Boolean) as Photo[];
+
+                          setPhotos((prev) => [...prev, ...newPhotos]);
+                          console.log(newPhotos, photos);
                         }}
-                        className="w-30 p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 mt-2"
-                        />
-                      </div>
-                      <button
-                        onClick={() => handleDeletePhoto(photo.id)}
-                        className="absolute -top-0 -right-0 bg-red-500 text-white rounded-bl-lg rounded-tr-sm rounded-tl-none rounded-br-none w-6 h-6 flex items-center justify-center text-sm font-bold hover:bg-red-600"
-                      >
-                        ×
-                      </button>
-                      </div>
-                    ))}
-                    <label
-                      htmlFor="photo-upload"
-                      className="w-full h-16 rounded-md bg-orange-100 border-2 border-dashed border-orange-400 flex items-center justify-center cursor-pointer hover:bg-orange-200"
-                    >
-                      <span className="text-orange-500 text-lg font-bold">
-                      Agregar archivo
-                      </span>
-                    </label>
-                    <input
-                      type="file"
-                      id="photo-upload"
-                      accept="image/*,application/pdf"
-                      multiple
-                      className="hidden"
-                      onChange={handleAddPhoto}
-                    />
+                      />
                     </div>
                 </div>
               </div>
 
               <div>
-                <div className="mb-3 flex flex-col">
+                <div className="mb-3 flex flex-col ">
                   <label>Fecha:</label>
                   <DateRange
                     ranges={[selectionRange]}
                     onChange={handleSelect}
                     locale={es} // Pass the Spanish locale here
+                    className="custom-date-range"
                   />
-                  <h2>{`Cantidad de dias: ${daysCount}`}</h2>
+                  <h2>{`Cantidad de días: ${daysCount}`}</h2>
                 </div>
               </div>
             </div>
@@ -284,7 +307,7 @@ const Home = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-12 py-2  bg-blue-500 text-white rounded-2xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                className="px-12 py-2  bg-grisclaro text-white rounded-2xl hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
               >
                 Enviar
               </button>
@@ -292,7 +315,9 @@ const Home = () => {
           </form>
         </div>
       </section>
+      
     </UpdateTriggerProvider>
+    
   );
 };
 

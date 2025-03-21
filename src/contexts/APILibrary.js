@@ -144,7 +144,7 @@ export async function mailUsuario(dni) {
       let datos = resp.data;
       if (datos.length > 0) {
         respuestaAPI = 200;
-        return { status: respuestaAPI, datos: datos[0] };
+        return { status: respuestaAPI, datos: datos[0], empresa }; 
       }
     } catch (error) {
       console.error(error);
@@ -309,7 +309,7 @@ export async function traerLicencias(FK_WS_USUARIOS, pagina, empresa) {
     //https://webapp.tgroup.com.ar/webapp/clases/Ws_NOTIFICACIONES?cliente=TGROUP&sqlFilter=FK_WS_USUARIOS = '3076d266-6b7c-41d6-b3cf-24b1f224c9aa' AND OPERACION = 'E'
     const resp = await axios.get(
       `${URL}/clases/Ws_NOTIFICACIONES?cliente=${empresa}&&sqlFilter=FK_WS_USUARIOS = '${FK_WS_USUARIOS}' AND OPERACION = 'L'${
-        pagina ? `&page=${pagina}` : ""
+        pagina ? `&page=${pagina}&sqlOrderBy=FEC_HAS DESC` : ""
       }`,
       config
     );

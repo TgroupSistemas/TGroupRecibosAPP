@@ -18,7 +18,10 @@ const config: Config = {
         celeste: '#3483FA',
         rojo: '#E60002',
         verde: '#02A64F',
-        gris: '#EDEDED'
+        gris: '#EDEDED',
+        verdegris: '#41928b',
+        grisclaro: '#50bbb0',
+        grisclaro2: '#47a79d',
       },
     },
   },

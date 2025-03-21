@@ -14,6 +14,7 @@ import { addDays } from "date-fns";
 import Image from "next/image";
 import { differenceInDays } from "date-fns";
 import LicenciaCard from "@/components/LicenciaCard";
+import PopUpLicencia from "@/components/PopUpLicencia";
 
 import React from "react";
 interface Photo {
@@ -73,9 +74,9 @@ const Home = () => {
             <button
               type="button"
               onClick={() => irALicencias()}
-              className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-5 py-2 bg-grisclaro2 text-white rounded-lg hover:bg-grisclaro focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              Pedir licencia
+              Solicitar licencia
             </button>
           </div>
     <h1 className="sm:text-3xl text-2xl mb-10 font-medium title-font text-gray-900">
@@ -83,7 +84,7 @@ const Home = () => {
     </h1>
     {!loadingLicencia && (
     <div className="flex justify-center">
-      <div className="w-1/2">
+      <div className="lg:w-1/2">
       {licencias.map((licencia, index) => (
         <LicenciaCard key={index} index={index} notificacion={licencia} setNotiAbierta={setNotiAbierta} setNotiEstado={setNotiEstado} />
       ))}
@@ -94,6 +95,8 @@ const Home = () => {
 </div>
 </div>
 </section>
+{notiEstado &&  
+      <PopUpLicencia notificacionArray={licencias} setNotiEstado={setNotiEstado} notiAbierta={notiAbierta}  />}
     </UpdateTriggerProvider>
   );
 };
