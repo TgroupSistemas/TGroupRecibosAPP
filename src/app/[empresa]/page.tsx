@@ -12,33 +12,31 @@ import { useAppContext } from "@/contexts/AppContext";
 import ModuloBoton from "@/components/ModuloBoton";
 
 export default function Home() {
-  /*const {
-    modulosAccesibles,
-  } = useAppContext();*/
+  const { getCookie } = useAppContext();
+  const [empresa, setEmpresa] = useState<string >("");
+  const [loadingEmpresa, setLoadingEmpresa] = useState(true);
   const modulosAccesibles = [
     {
       NOMBRE: "Recibos",
       DIRECCION: "recibos",
-    },
-    /*{
+    }/*,
+    {
       NOMBRE: "Licencias",
       DIRECCION: "licencias",
     }*/
   ];
 
-  const [empresa, setEmpresa] = useState<string | null>(null);
-
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setEmpresa(window.location.pathname.split('/')[1]);
-    }
-  }, []);
+    const fetchEmpresa = async () => {
+      setLoadingEmpresa(true);
+      const empresa = await getCookie("fl_erp_empresas");
+      setEmpresa(empresa);
+      setLoadingEmpresa(false);
+    };
+    fetchEmpresa();
+  }, [getCookie]);
 
-  if (!empresa) {
-    return null; // or a loading spinner
-  }
-
-    return (
+  return (
     <UpdateTriggerProvider>
       <Navbar></Navbar>
       <section className="pt-40 md:pt-20">
@@ -47,7 +45,7 @@ export default function Home() {
               Modulos
             </h1>
           <div className="flex flex-wrap -m-4 ">
-            {/*!loadingEmpresa &&*/
+            {!loadingEmpresa &&
               modulosAccesibles.map(
                 (item, index) => (
                   (<ModuloBoton key={index} empresa={empresa} nombre={item.NOMBRE} direccion={item.DIRECCION}  />)

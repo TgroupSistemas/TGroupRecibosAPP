@@ -53,7 +53,7 @@ const PDFViewer: React.FC<PDFProps> = ({ id }) => {
   return (
     <div className="h-full pb-12 w-full">
       {PDF && !PDFLoading ? (
-        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.10.111/build/pdf.worker.min.js">
+        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
           <LocalizationContext.Provider
             value={{ l10n: es_ES, setL10n: () => {} }}
           >

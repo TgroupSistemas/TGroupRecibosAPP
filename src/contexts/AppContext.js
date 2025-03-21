@@ -25,11 +25,16 @@ import {
   aceptarVDP,
   datosUsuario,
   traerEmpresas,
-  traerPDF
+  traerPDF,
+  postLicencia,
+  traerNotificaciones,
+  uploadFile,
+  traerLicencias,
 } from "./APILibrary";
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
 import { get } from "http";
+import { env } from "process";
 dotenv.config();
 
 const AppContext = createContext();
@@ -75,54 +80,81 @@ export const AppContextProvider = ({ children }) => {
     try {
       const data = await logeo(credentials);
       if (data.status == 200) {
-    
-        setHasPassw(data.datos.PASSWORD != "" && data.datos.PASSWORD != null ? true : false);
+        setHasPassw(
+          data.datos.PASSWORD != "" && data.datos.PASSWORD != null
+            ? true
+            : false
+        );
         setResponseLogin(data);
-        postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID,);
+        postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID);
         console.log(data);
-        document.cookie = "isloggedin=" + await setCookie("true") + "; max-age=28800; path=/";
-        document.cookie = `id=${await setCookie(data.datos.ID)}; max-age=28800; path=/`;
-        document.cookie = `hasPassword=${await setCookie(data.datos.PASSWORD != "" && data.datos.PASSWORD != null? "true" : "false")}; max-age=28800; path=/`;
         document.cookie =
-          "rs_elecom=" + await setCookie(data.datos.ELECOM_RS) + "; max-age=28800; path=/";
-          document.cookie =
-          "name=" + await setCookie(data.datos.FULLNAME) + "; max-age=28800; path=/";
+          "isloggedin=" + (await setCookie("true")) + "; max-age=28800; path=/";
+        document.cookie = `id=${await setCookie(
+          data.datos.ID
+        )}; max-age=28800; path=/`;
+        document.cookie = `hasPassword=${await setCookie(
+          data.datos.PASSWORD != "" && data.datos.PASSWORD != null
+            ? "true"
+            : "false"
+        )}; max-age=28800; path=/`;
+        document.cookie =
+          "rs_elecom=" +
+          (await setCookie(data.datos.ELECOM_RS)) +
+          "; max-age=28800; path=/";
+        document.cookie =
+          "name=" +
+          (await setCookie(data.datos.FULLNAME)) +
+          "; max-age=28800; path=/";
         document.cookie =
           "fl_erp_empresas=" +
-          await setCookie(data.datos.FK_WS_CLIENTES) +
+          (await setCookie(data.datos.FK_WS_CLIENTES)) +
           "; max-age=28800; path=/";
         document.cookie =
           "elecom_vendedor=" +
-          await setCookie(data.datos.ELECOM_VENDEDOR) +
+          (await setCookie(data.datos.ELECOM_VENDEDOR)) +
           "; max-age=28800; path=/";
         document.cookie =
-          "username=" + await setCookie(data.datos.USERNAME) + "; max-age=28800; path=/";
+          "username=" +
+          (await setCookie(data.datos.USERNAME)) +
+          "; max-age=28800; path=/";
         document.cookie =
-          "mail=" + await setCookie(data.datos.EMAIL) + "; max-age=28800; path=/";
-          const datmail = data.datos.EMAIL_VERIFICADO != null ? data.datos.EMAIL_VERIFICADO.toString() : "false"; // Default to "false" if null or undefined
+          "mail=" +
+          (await setCookie(data.datos.EMAIL)) +
+          "; max-age=28800; path=/";
+        const datmail =
+          data.datos.EMAIL_VERIFICADO != null
+            ? data.datos.EMAIL_VERIFICADO.toString()
+            : "false"; // Default to "false" if null or undefined
         document.cookie =
-          "mailverificado=" + await setCookie(datmail) + "; max-age=28800; path=/";
-          const tycValue = data.datos.ACEPTA_TYC != null ? data.datos.ACEPTA_TYC.toString() : "false"; // Default to "false" if null or undefined
-          document.cookie =
-          "tyc=" + await setCookie(tycValue) + "; max-age=28800; path=/"; 
-          document.cookie =
-          "vdp=" + await setCookie(data.datos.ACEPTA_DP) + "; max-age=28800; path=/"; 
+          "mailverificado=" +
+          (await setCookie(datmail)) +
+          "; max-age=28800; path=/";
+        const tycValue =
+          data.datos.ACEPTA_TYC != null
+            ? data.datos.ACEPTA_TYC.toString()
+            : "false"; // Default to "false" if null or undefined
+        document.cookie =
+          "tyc=" + (await setCookie(tycValue)) + "; max-age=28800; path=/";
+        document.cookie =
+          "vdp=" +
+          (await setCookie(data.datos.ACEPTA_DP)) +
+          "; max-age=28800; path=/";
         document.cookie =
           "fk_erp_contactos=" +
-          await setCookie(data.datos.FK_ERP_CONTACTOS) +
+          (await setCookie(data.datos.FK_ERP_CONTACTOS)) +
           "; max-age=28800; path=/";
         document.cookie =
           "menu=" +
-          await setCookie(JSON.stringify(data.datos.WS_DET_CLI_MENU)) +
+          (await setCookie(JSON.stringify(data.datos.WS_DET_CLI_MENU))) +
           "; max-age=28800; path=/";
-          document.cookie =
+        document.cookie =
           "empresasHabilitadas=" +
-          await setCookie(JSON.stringify(data.datos.WS_DET_CLI_EMPRESAS)) +
+          (await setCookie(JSON.stringify(data.datos.WS_DET_CLI_EMPRESAS))) +
           "; max-age=28800; path=/";
-          setLoggedIn(true);
+        setLoggedIn(true);
 
         return true;
-
       } else {
         return false;
       }
@@ -158,104 +190,99 @@ export const AppContextProvider = ({ children }) => {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   }
   const getUsername = useCallback(async () => {
-    if (await getCookie("username") == null) {
+    if ((await getCookie("username")) == null) {
       return "TGROUP";
     }
-    return (
-      formatNumberWithDots(await getCookie("username"))
-    );
+    return formatNumberWithDots(await getCookie("username"));
   }, []);
   const getEmpresasHab = useCallback(async () => {
-    if (await await getCookie("empresasHabilitadas") == null) {
+    if ((await await getCookie("empresasHabilitadas")) == null) {
       return [];
     }
 
-    return (
-      await getCookie("empresasHabilitadas")
-    );
+    return await getCookie("empresasHabilitadas");
   }, []);
-
 
   const getEmpresasHab2 = useCallback(async () => {
     try {
-        const empresasHabilitadas = await getCookie("empresasHabilitadas");
-        if (empresasHabilitadas == null) {
-            return [];
-        }
-
-        const result = await traerEmpresas(empresasHabilitadas, await getCookie("fl_erp_empresas"));
-
-        // Map through empresasHabilitadas and add the corresponding DESCRIPCION
-        const combinedArray = result.datos.map(item1 => {
-          const matchingItem = JSON.parse(empresasHabilitadas).find(item2 => item2.FK_WS_CLIENTES === item1.CODIGO);
-          if (matchingItem) {
-            const { CODIGO, ...remainingFields } = item1; // Remove CODIGO
-            return { DESCRIPCION: remainingFields.DESCRIPCION, ...matchingItem };
-          }
-          return item1;
-        });
-        return combinedArray;
-    } catch (error) {
-        console.error("Error in getEmpresasHab2:", error);
+      const empresasHabilitadas = await getCookie("empresasHabilitadas");
+      if (empresasHabilitadas == null) {
         return [];
+      }
+
+      const result = await traerEmpresas(
+        empresasHabilitadas,
+        await getCookie("fl_erp_empresas")
+      );
+
+      // Map through empresasHabilitadas and add the corresponding DESCRIPCION
+      const combinedArray = result.datos.map((item1) => {
+        const matchingItem = JSON.parse(empresasHabilitadas).find(
+          (item2) => item2.FK_WS_CLIENTES === item1.CODIGO
+        );
+        if (matchingItem) {
+          const { CODIGO, ...remainingFields } = item1; // Remove CODIGO
+          return { DESCRIPCION: remainingFields.DESCRIPCION, ...matchingItem };
+        }
+        return item1;
+      });
+      return combinedArray;
+    } catch (error) {
+      console.error("Error in getEmpresasHab2:", error);
+      return [];
     }
-}, []);
+  }, []);
 
   const getEmpresaName = useCallback(async () => {
-    if (await await getCookie("fl_erp_empresas") == null) {
+    if ((await await getCookie("fl_erp_empresas")) == null) {
       return "TGROUP";
     }
     return (
-      await getCookie("fl_erp_empresas").charAt(0).toUpperCase() +
-      await getCookie("fl_erp_empresas").slice(1).toLowerCase()
+      (await getCookie("fl_erp_empresas").charAt(0).toUpperCase()) +
+      (await getCookie("fl_erp_empresas").slice(1).toLowerCase())
     );
   }, []);
   const getName = useCallback(async () => {
-    if (await await getCookie("name") == null) {
+    if ((await await getCookie("name")) == null) {
       return "TGROUP";
     }
-    return (
-      await getCookie("name")
-    );
+    return await getCookie("name");
   }, []);
   const [correoLoading, setCorreoLoading] = useState("");
   const [correoError, setCorreoError] = useState("");
-  
-  const ponerMail = useCallback(
-    async () => {
-      setCorreoLoading(true);
-      const idUser = await getCookie("id");
-      try {
-        const data = await updateCorreo(
-          idUser,
-          await getCookie("fl_erp_empresas"),
-        );
-        if (data == 200) {
-          document.cookie =
-          "mailverificado=" + await setCookie("true") + "; max-age=28800; path=/";
-        setMailVerificadoCambio(true);
-          setCorreoLoading(false);
-        } else {
-          console.log("ERRORRR correo");
-        }
-      } catch (error) {
-        console.error(error);
-        console.log("HOLAAAAA")
-        
-        setCorreoLoading(false);
-        correoError("Error al actualizar el correo");
 
+  const ponerMail = useCallback(async () => {
+    setCorreoLoading(true);
+    const idUser = await getCookie("id");
+    try {
+      const data = await updateCorreo(
+        idUser,
+        await getCookie("fl_erp_empresas")
+      );
+      if (data == 200) {
+        document.cookie =
+          "mailverificado=" +
+          (await setCookie("true")) +
+          "; max-age=28800; path=/";
+        setMailVerificadoCambio(true);
+        setCorreoLoading(false);
+      } else {
+        console.log("ERRORRR correo");
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.error(error);
+      console.log("HOLAAAAA");
+
+      setCorreoLoading(false);
+      correoError("Error al actualizar el correo");
+    }
+  }, []);
   const removeAlert = (index) => {
     const updatedAlerts = [...alerts];
     updatedAlerts.splice(index, 1);
     setAlerts(updatedAlerts);
-};
+  };
   const activarPopUpFiltro = useCallback(async () => {
-
     setPopUpFiltroActivo(!popUpFiltroActivo);
   }, []);
 
@@ -263,29 +290,37 @@ export const AppContextProvider = ({ children }) => {
     return await getCookie("fl_erp_empresas");
   }, []);
 
-
   const enviarMailRecuperacion = useCallback(async (dni, nuevaContraseña) => {
     const headers = {
       "content-type": "application/json; charset=utf-8",
     };
     try {
-      const data = await mailUsuario(dni, await getCookie("fl_erp_empresas"));
+      const data = await mailUsuario(dni);
+      console.log(data, "ASDA");
       if (data.status == 200) {
-        const data2 = await cambioPassword(nuevaContraseña, data.datos.ID, 'tgroup');
+        const data2 = await cambioPassword(
+          nuevaContraseña,
+          data.datos.ID,
+          data.empresa
+        );
+        console.log(data2, "ASDA");
+        if (data2.status == 200) {
+          const response = await fetch("/api/sendEmail2", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: data.datos.EMAIL,
+              pass: nuevaContraseña,
+            }),
+          });
 
-        const response = await fetch("/api/sendEmail2", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: data.datos.EMAIL, pass: nuevaContraseña }),
-        });
-    
-        if (!response.ok) {
-          throw new Error("Failed to send verification email");
+          if (!response.ok) {
+            throw new Error("Failed to send verification email");
+          }
+          return true;
         }
-        return true;
-
       } else {
         return false;
       }
@@ -304,8 +339,55 @@ export const AppContextProvider = ({ children }) => {
       if (data.status == 200) {
         console.log(data, "ASDA");
         return data.datos;
-    
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
+  const [loadingNotificaciones, setLoadingNotificaciones] = useState(false);
+  const traerNotificacionesUser = useCallback(async () => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      setLoadingNotificaciones(true);
+      const data = await traerNotificaciones(
+        await getCookie("id"),
+        1,
+        await getCookie("fl_erp_empresas")
+      );
+      if (data.status == 200) {
+        console.log(data, "ASDA");
+        setLoadingNotificaciones(false);
+        return data.datos;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
+  const [loadingLicencias, setLoadingLicencias] = useState(false);
 
+  const traerLicenciaUser = useCallback(async () => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      setLoadingLicencias(true);
+      const data = await traerLicencias(
+        await getCookie("id"),
+        1,
+        await getCookie("fl_erp_empresas")
+      );
+      if (data.status == 200) {
+        console.log(data, "ASDA");
+        setLoadingLicencias(false);
+        return data.datos;
       } else {
         return false;
       }
@@ -318,13 +400,12 @@ export const AppContextProvider = ({ children }) => {
   const aceptarTerminos = useCallback(async () => {
     const id = await getCookie("id");
     try {
-      const data = await aceptarTYC(
-        id,
-        await getCookie("fl_erp_empresas")
-      );
+      const data = await aceptarTYC(id, await getCookie("fl_erp_empresas"));
 
       if (data.status == 200) {
-        document.cookie = `tyc=${await setCookie("true")}; max-age=28800; path=/`;
+        document.cookie = `tyc=${await setCookie(
+          "true"
+        )}; max-age=28800; path=/`;
         setTycCambio(true);
       } else {
         console.log("ERRORRR cambio password");
@@ -333,7 +414,6 @@ export const AppContextProvider = ({ children }) => {
       console.error(error);
     }
   }, []);
-
 
   const setVDP = useCallback(async (ver, desc = "") => {
     const id = await getCookie("id");
@@ -344,7 +424,6 @@ export const AppContextProvider = ({ children }) => {
         ver,
         desc,
         generarHora()
-
       );
 
       if (data.status == 200) {
@@ -371,7 +450,9 @@ export const AppContextProvider = ({ children }) => {
       );
 
       if (data.status == 200) {
-        document.cookie = `hasPassword=${await setCookie("true")}; max-age=28800; path=/`;
+        document.cookie = `hasPassword=${await setCookie(
+          "true"
+        )}; max-age=28800; path=/`;
         setHasPassw(true);
       } else {
         console.log("ERRORRR cambio password");
@@ -383,56 +464,44 @@ export const AppContextProvider = ({ children }) => {
   const addAlert = (message) => {
     const newAlert = message;
     setAlerts([...alerts, newAlert]);
-};
+  };
 
-  
   function generateSqlFilterParams(parametros, filtro) {
     // Split the parametros string into an array of parameter names
-  
-    
+
     // Map each parameter name to a SQL-like filter string
-    const filters = parametros.map(param => `${param} LIKE '%${filtro}%'`);
-    
+    const filters = parametros.map((param) => `${param} LIKE '%${filtro}%'`);
+
     // Join the filter strings with ' OR '
-    const sqlFilter = filters.join(' OR ');
-    
+    const sqlFilter = filters.join(" OR ");
+
     return sqlFilter;
-    }
-    function generateSqlParams(dataActual) {
-      // Extract values from the object and return as an array
-      return Object.keys(dataActual);
-    }
-    
+  }
+  function generateSqlParams(dataActual) {
+    // Extract values from the object and return as an array
+    return Object.keys(dataActual);
+  }
 
   const [recibosSinFirmarLoading, setRecibosSinFirmarLoading] = useState(true);
   const [recibosSinFirmar, setRecibosSinFirmar] = useState("");
-  
-  const getRecibosSinFirmar = useCallback(
-    
-    async (empresa) => {
-      setRecibosSinFirmarLoading(true);
-      const id = await getCookie("id");
-      try {
-        const data = await getRecibos(
-          id,
-          empresa,
-          false,
-          1
-        );
 
-        if (data.status == 200) {
-          console.log("algo",data.datos);
-          setRecibosSinFirmarLoading(false);
-          setRecibosSinFirmar(data.datos);
-        } else {
-          console.log("ERRORRR recibos");
-        }
-      } catch (error) {
-        console.error(error);
+  const getRecibosSinFirmar = useCallback(async (empresa) => {
+    setRecibosSinFirmarLoading(true);
+    const id = await getCookie("id");
+    try {
+      const data = await getRecibos(id, empresa, false, 1);
+
+      if (data.status == 200) {
+        console.log("algo", data.datos);
+        setRecibosSinFirmarLoading(false);
+        setRecibosSinFirmar(data.datos);
+      } else {
+        console.log("ERRORRR recibos");
       }
-    },
-    []
-  );
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
   const [recibosFirmadosLoading, setRecibosFirmadosLoading] = useState(true);
   const [recibosFirmados, setRecibosFirmados] = useState([]);
   const getRecibosFirmados = useCallback(
@@ -440,17 +509,16 @@ export const AppContextProvider = ({ children }) => {
       setRecibosFirmadosLoading(true);
       const id = await getCookie("id");
       let page = recibosFirmados.length + 1; // Use the current length as the page number
-      if(recibosFirmados.length == 0)
-      {
+      if (recibosFirmados.length == 0) {
         page = 1;
       }
       try {
         const data = await getRecibos(id, empresa, true, page);
-  
+
         if (data.status === 200) {
-          setRecibosFirmados(prevState => {
+          setRecibosFirmados((prevState) => {
             const newState = [...prevState];
-            newState[page-1] = data.datos;
+            newState[page - 1] = data.datos;
             return newState;
           });
           setRecibosFirmadosLoading(false);
@@ -467,19 +535,21 @@ export const AppContextProvider = ({ children }) => {
   );
 
   function generarHora() {
-    return new Date().toLocaleString('en-CA', { 
-      timeZone: 'America/Argentina/Buenos_Aires', 
-      year: 'numeric', 
-      month: '2-digit', 
-      day: '2-digit', 
-      hour: '2-digit', 
-      minute: '2-digit', 
-      second: '2-digit', 
-      hour12: false 
-  }).replace(', ', 'T').replace(/(\d+)\/(\d+)\/(\d+)/, '$3-$1-$2')
+    return new Date()
+      .toLocaleString("en-CA", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      })
+      .replace(", ", "T")
+      .replace(/(\d+)\/(\d+)\/(\d+)/, "$3-$1-$2");
   }
   const updateReciboFirmado = useCallback(
-    
     async (id, estado, disconformidad, empresa) => {
       setRecibosFirmaLoading(true);
       try {
@@ -505,13 +575,10 @@ export const AppContextProvider = ({ children }) => {
   );
 
   const updateComentarioRecibo = useCallback(
-    
     async (id, disconformidad, empresa) => {
       setRecibosFirmaLoading(true);
       try {
-        const data = await updateReciboComentario(
-          id,
-          disconformidad        );
+        const data = await updateReciboComentario(id, disconformidad);
         //await postLogRecibo(empresa, estado, id, await getCookie("id"));
 
         if (data == 200) {
@@ -526,20 +593,37 @@ export const AppContextProvider = ({ children }) => {
     },
     []
   );
+  const [imagenLoading, setImagenLoading] = useState(false);
+  const enviarImagen = useCallback(async (archivo, descrip) => {
+    setImagenLoading(true);
+    try {
+      const token = await getTokenAPI("tgroup");
+      const data = await uploadFile(token.datos[0].GCS_TOKEN, archivo);
+      const titulo = descrip + "|" + data.name + "|";
+      setImagenLoading(false);
+      console.log("a", data, titulo);
+      return { titulo, status: 200 };
+    } catch (error) {
+      return 300;
+      console.error(error);
+    }
+  }, []);
 
   const postLogRecibo = useCallback(
     //L|Login|D|Descarga recibo|F|Firma ok recibo|X|Firma disconforme recibo
     async (FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_USUARIOS) => {
       setLogLoading(true);
-      if(FK_WS_USUARIOS=="")
-      {
+      if (FK_WS_USUARIOS == "") {
         FK_WS_USUARIOS = await getCookie("id");
       }
-      
-      try {
 
+      try {
         const data = await postLog(
-          FK_WS_CLIENTES, OPERACION, FK_WS_RECIBOS, FK_WS_USUARIOS, generarHora()
+          FK_WS_CLIENTES,
+          OPERACION,
+          FK_WS_RECIBOS,
+          FK_WS_USUARIOS,
+          generarHora()
         );
         if (data == 200) {
           setLogLoading(false);
@@ -553,6 +637,42 @@ export const AppContextProvider = ({ children }) => {
     },
     []
   );
+  const [licenciaLoading, setLicenciaLoading] = useState(false);
+  const licenciaPost = useCallback(async (licenciaData) => {
+    setLicenciaLoading(true);
+
+    const FK_WS_USUARIOS = await getCookie("id");
+    const FK_WS_CLIENTES = await getCookie("fl_erp_empresas");
+
+    try {
+      console.log(licenciaData);
+      const data = await postLicencia({
+        FK_WS_USUARIOS,
+        TIPO_LIC: licenciaData.tipoLicencia,
+        OPERACION: "L",
+        NOTAS: licenciaData.notas,
+        FEC_HAS: licenciaData.selectionRange.endDate.toISOString(),
+        FEC_DES: licenciaData.selectionRange.startDate.toISOString(),
+        FK_WS_CLIENTES,
+        CANTIDAD: licenciaData.daysCount,
+        FECHA_HORA: generarHora(),
+        ARCHIVOS: licenciaData.ARCHIVOS,
+      });
+      console.log(data);
+      if (data.status == 200) {
+        setLicenciaLoading(false);
+        return 200;
+        console.log(data);
+      } else {
+        console.log("ke");
+        return 300;
+        console.log("ERRORRR recibos");
+      }
+    } catch (error) {
+      return 300;
+      console.error(error);
+    }
+  }, []);
 
   const getClases = useCallback(async () => {
     const menu = JSON.parse(await getCookie("menu"));
@@ -600,23 +720,22 @@ export const AppContextProvider = ({ children }) => {
     if (name == null) {
       name = "";
     }
-        const response = await fetch("/api/getCookies", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ cookie: name, method: "encrypt" }),
-        });
-        const res = await response.json()
-        return res.value;
-      }
+    const response = await fetch("/api/getCookies", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ cookie: name, method: "encrypt" }),
+    });
+    const res = await response.json();
+    return res.value;
+  }
 
   async function getCookie(name) {
     const cookies = document.cookie.split("; ");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].split("=");
-      if (cookie[0] === name && cookie[1] != '') {
-
+      if (cookie[0] === name && cookie[1] != "") {
         const response = await fetch("/api/getCookies", {
           method: "POST",
           headers: {
@@ -624,11 +743,10 @@ export const AppContextProvider = ({ children }) => {
           },
           body: JSON.stringify({ cookie: cookie[1], method: "decrypt" }),
         });
-        const res = await response.json()
+        const res = await response.json();
 
-        return await  res.value;
+        return await res.value;
       }
-      
     }
     return null;
   }
@@ -636,7 +754,7 @@ export const AppContextProvider = ({ children }) => {
   const fetchPDF = async (id) => {
     setPDFLoading(true);
     const token = await getTokenAPI("tgroup");
-    const pdf1 = await traerPDF(token.datos[0].GCS_TOKEN, id)
+    const pdf1 = await traerPDF(token.datos[0].GCS_TOKEN, id);
     setPDF(pdf1);
     setPDFLoading(false);
   };
@@ -721,13 +839,22 @@ export const AppContextProvider = ({ children }) => {
         getRecibosFirmados,
         recibosFirmadosLoading,
         recibosFirmados,
-        fetchPDF,PDF,PDFLoading,
+        fetchPDF,
+        PDF,
+        PDFLoading,
         mailVerificadoCambio,
         tycCambio,
         setVDP,
         getEmpresasHab2,
+        loadingNotificaciones,
         vdpCambio,
-        updateComentarioRecibo
+        updateComentarioRecibo,
+        licenciaPost,
+        traerNotificacionesUser,
+        enviarImagen,
+        imagenLoading,
+        traerLicenciaUser,
+        licenciaLoading,
       }}
     >
       {children}
