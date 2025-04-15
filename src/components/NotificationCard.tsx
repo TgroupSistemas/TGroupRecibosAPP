@@ -37,11 +37,14 @@ const NotificationCard: React.FC<NotificationCardProps> = ({
   setNotiAbierta,
   setNotiEstado,
 }) => {
-  const { postLogRecibo, getCookie } = useAppContext();
+  const { postLogRecibo, getCookie, updateNotificacion } = useAppContext();
   const handleClick = async () => {
-    notificacion.ESTADO = "L";
     setNotiAbierta(index);
     setNotiEstado(true);
+    if(notificacion.ESTADO === "L") return;
+    notificacion.ESTADO = "L";
+    await updateNotificacion(notificacion
+    );
   };
 
   const cardClassName = `btn border-none text-white   w-28  "bg-slate-500"`;

@@ -27,7 +27,7 @@ const Home = () => {
   const [fechaDesde, setFechaDesde] = useState("");
   const [fechaHasta, setFechaHasta] = useState("");
   const [notas, setNotas] = useState("");
-  const [tipoLicencia, setTipoLicencia] = useState("V");
+  const [tipoLicencia, setTipoLicencia] = useState("");
   const [archivos, setArchivos] = useState<File[]>([]);
   const [daysCount, setDaysCount] = useState(1);
   const [errorsito, setError] = useState("")
@@ -145,23 +145,32 @@ const Home = () => {
               onClick={() => irAVerLicencias()}
               className="px-4 py-2 bg-verdegris text-white md>my-0 my-5 rounded-lg hover:bg-grisclaro focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              Tus Licencias
+              Ver Licencias y documentación
             </button>
           </div>
             <h1 className="text-2xl font-bold mb-5 text-slate-700 text-center">
-              Solicitud de Licencia
+            Documentación y Licencias
             </h1>
           
 
             <div className="flex flex-col md:flex-row gap-10">
               <div className="md:mx-0 md:mr-10 mx-5 ">
                 <div className="mb-5 ">
-                  <label>Tipo de Licencia:</label>
+                  <label>Tipo de Carga:</label>
                   <select
+                  required
                     value={tipoLicencia}
                     onChange={(e) => setTipoLicencia(e.target.value)}
                     className="w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
+                  <option value="" disabled hidden >
+                    Seleccione una opción
+                  </option>
+                  <option value="null" disabled className="text-gray-500">─── Documentación ───</option>
+
+                    <option value="U">Documentación</option>
+
+                    <option value="null" disabled className="text-gray-500">─── Licencias ───</option>
                     <option value="V">Vacaciones</option>
                     <option value="E">Enfermedad</option>
                     <option value="A">Accidente</option>
@@ -182,7 +191,7 @@ const Home = () => {
                     <textarea
                     value={notas}
                     onChange={(e) => {
-                        const value = e.target.value.replace(/[^a-zA-Z0-9\s!?¡¿]/g, "");
+                        const value = e.target.value.replace(/[^a-zA-Z0-9\s!?¡¿áéíóúÁÉÍÓÚ]/g, "");
                       setNotas(value);
                     }}
                     className="w-full p-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -279,7 +288,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <div>
+                <div className={`${tipoLicencia === 'U' || tipoLicencia === '' ? 'hidden' : ''}`}>
                 <div className="mb-3 flex flex-col ">
                   <label>Fecha:</label>
                   <DateRange

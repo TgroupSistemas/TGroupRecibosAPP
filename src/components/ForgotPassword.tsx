@@ -51,13 +51,17 @@ function censorEmail(email: string): string {
         setError("Completá el campo para avanzar");
         return;
       }
+      setLoading(true);
       const nuevaContraseña = generateSecurePassword()
       const resultado = await enviarMailRecuperacion(dni, nuevaContraseña);
       if (resultado) {
         setStep(1);
+        setLoading(false);
       }
       else {
         setError("El DNI ingresado no se encuentra registrado en el sistema");
+        setLoading(false);
+
       }
 
     }
@@ -93,16 +97,23 @@ function censorEmail(email: string): string {
             <input id="dni" name="dni" type="number" onChange={e => setDNI(e.target.value)}   required className="block  w-full rounded-md border-0 py-2 bg-white text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 mb-2 mt-2 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"/>
 
             <p className="text-red-500 text-sm mt-0 mb-2">{error}</p>
-
-              <button
-                className="px-4 py-2 mr-2 w-full bg-verde text-white rounded hover:bg-green-700 transition-all mt-1"
-                onClick={() => handleClick()}
-              >
-                Enviar
-              </button>
+            {loading && (
+            <div className="flex justify-center">
+              <span className="loading loading-infinity loading-lg"></span>
             </div>
           )}
-
+                <button
+                disabled={loading}
+                className={`px-4 py-2 mr-2 w-full text-white rounded transition-all mt-1 ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-verde hover:bg-green-700"
+                }`}
+                onClick={() => handleClick()}
+                >
+                Enviar
+                </button>
+            </div>
+          )}
+          
           {step === 1 && (
             <div>
 

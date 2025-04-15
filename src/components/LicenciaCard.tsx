@@ -51,12 +51,18 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
       className={`flex  items-center bg-gray-200 md:h-24 h-40 rounded-xl mb-2 pr-4`}
     >
       <div className={cardClassSide}>
-        {differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1}{" "}
-        {differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1 === 1 ? "día" : "días"}
+        {notificacion.OPERACION === 'A' 
+          ? "DOC" 
+          : `${differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1} ${
+              differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1 === 1 ? "día" : "días"
+            }`}
       </div>
       <div className=" md:flex md:justify-between md:w-full pl-4 md:pl-6 md:items-center ">
         <div className="text-black font-bold mb-5 md:mb-0 text-left">
             {(() => {
+            if (notificacion.OPERACION === 'A') {
+              return "Documentación";
+            }
             switch (notificacion.TIPO_LIC) {
               case "V":
               return "Vacaciones";
@@ -88,6 +94,7 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
               return "Desconocido";
             }
             })()}
+            
             <p className="text-gray-400">{new Date(notificacion.FEC_DES).toLocaleDateString() === new Date(notificacion.FEC_HAS).toLocaleDateString()
           ? new Date(notificacion.FEC_DES).toLocaleDateString()
           : `${new Date(notificacion.FEC_DES).toLocaleDateString()} - ${new Date(notificacion.FEC_HAS).toLocaleDateString()}`}</p>

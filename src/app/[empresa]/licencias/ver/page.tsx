@@ -74,20 +74,30 @@ const Home = () => {
             <button
               type="button"
               onClick={() => irALicencias()}
-              className="px-5 py-2 bg-grisclaro2 text-white rounded-lg hover:bg-grisclaro focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              className="px-5 py-2 bg-grisclaro2 my-5 text-white rounded-lg hover:bg-grisclaro focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              Solicitar licencia
+              Cargar licencia/documentación
             </button>
           </div>
     <h1 className="sm:text-3xl text-2xl mb-10 font-medium title-font text-gray-900">
-      Tus licencias
+      Licencias y documentación
     </h1>
     {!loadingLicencia && (
     <div className="flex justify-center">
       <div className="lg:w-1/2">
-      {licencias.map((licencia, index) => (
-        <LicenciaCard key={index} index={index} notificacion={licencia} setNotiAbierta={setNotiAbierta} setNotiEstado={setNotiEstado} />
-      ))}
+      {licencias.length === 0 ? (
+        <p className="text-center text-gray-500">No tenés licencias registradas.</p>
+      ) : (
+        licencias.map((licencia, index) => (
+          <LicenciaCard
+        key={index}
+        index={index}
+        notificacion={licencia}
+        setNotiAbierta={setNotiAbierta}
+        setNotiEstado={setNotiEstado}
+          />
+        ))
+      )}
       </div>
     </div>
     )}

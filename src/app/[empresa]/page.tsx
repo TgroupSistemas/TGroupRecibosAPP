@@ -15,15 +15,29 @@ export default function Home() {
   const { getCookie } = useAppContext();
   const [empresa, setEmpresa] = useState<string >("");
   const [loadingEmpresa, setLoadingEmpresa] = useState(true);
+  const [updateVisible, setUpdateVisible] = useState(false);
+  useEffect(() => {
+    const checkUpdateVisible = async () => {
+      const empresaCookie = await getCookie("fl_erp_empresas");
+      setUpdateVisible(empresaCookie === "TGROUP");
+    };
+    checkUpdateVisible();
+  }, [getCookie]);
+  const modulosAccesiblesUpdate = [
+    {
+      NOMBRE: "Recibos",
+      DIRECCION: "recibos",
+    },
+    {
+      NOMBRE: "Licencias y Documentación",
+      DIRECCION: "licencias",
+    }
+  ];
   const modulosAccesibles = [
     {
       NOMBRE: "Recibos",
       DIRECCION: "recibos",
-    }/*,
-    {
-      NOMBRE: "Licencias",
-      DIRECCION: "licencias",
-    }*/
+    }
   ];
 
   useEffect(() => {
@@ -46,10 +60,10 @@ export default function Home() {
             </h1>
           <div className="flex flex-wrap -m-4 ">
             {!loadingEmpresa &&
-              modulosAccesibles.map(
-                (item, index) => (
-                  (<ModuloBoton key={index} empresa={empresa} nombre={item.NOMBRE} direccion={item.DIRECCION}  />)
-                )
+              (updateVisible ? modulosAccesiblesUpdate : modulosAccesibles).map(
+              (item, index) => (
+                <ModuloBoton key={index} empresa={empresa} nombre={item.NOMBRE} direccion={item.DIRECCION} />
+              )
               )}
           </div>
         </div>

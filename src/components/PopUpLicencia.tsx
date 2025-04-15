@@ -84,13 +84,13 @@ const PopUpLicencia: React.FC<PopUpLicProps> = ({
             </h1>
 
                    
-                    <>
+            {notificacionArray[notiAbierta].OPERACION !== "A"? (<>
               <span className="text-base">Días:</span>
               <p className="text-lg font-semibold mb-3 border p-5 border-gray-400 rounded-md  ">
               {differenceInDays(new Date(notificacionArray[notiAbierta].FEC_HAS), new Date(notificacionArray[notiAbierta].FEC_DES)) + 1}{" "}
               {differenceInDays(new Date(notificacionArray[notiAbierta].FEC_HAS), new Date(notificacionArray[notiAbierta].FEC_DES)) + 1 === 1 ? "día" : "días"}
               </p>
-              </>
+              </>) : (<></>)}
             <>
               <span className="text-base">Notas:</span>
               {notificacionArray[notiAbierta].NOTAS ? (

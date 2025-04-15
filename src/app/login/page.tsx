@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import { Producto } from "@/app/Modelo";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faExclamationTriangle,
   faEye,
   faEyeSlash,
 } from "@fortawesome/free-solid-svg-icons";
@@ -36,12 +37,20 @@ export default function Home() {
       dni, // Make sure to use the state variables here
       password,
     });
+    console.log("Response:", response);
 
-    if (!response) {
+    if (response == 201) {
       setLoading(false);
 
       setError(
         "Error al iniciar sesión. Por favor, verifique los datos ingresados."
+      );
+    }
+    if (response == 502) {
+      setLoading(false);
+
+      setError(
+        "No pudimos conectar con el servicio. Es posible que esté temporalmente fuera de línea. Por favor, intentá más tarde."
       );
     }
   };
@@ -133,7 +142,15 @@ export default function Home() {
             </div>
             <div className="text-red-500">{}</div>
 
-            {error && <span className="text-red-500">{error}</span>}
+            {error === "No pudimos conectar con el servicio. Es posible que esté temporalmente fuera de línea. Por favor, intentá más tarde." && (
+              <span className="text-red-500">
+                <FontAwesomeIcon icon={faExclamationTriangle} className="text-yellow-500 mr-2" />
+                {error}
+              </span>
+            )}
+            {error !== "No pudimos conectar con el servicio. Es posible que esté temporalmente fuera de línea. Por favor, intentá más tarde." && (
+              <span className="text-red-500">{error}</span>
+            )}
 
             <div>
               <button

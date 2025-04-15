@@ -17,6 +17,10 @@ interface UserData {
   PISO: string | null;
   PROVINCIA: string | null;
   TE: string | null;
+  CALZADO: string | null;
+  PANTALON: string | null;
+  REMERA: string | null;
+  ENTRE_CALLES: string | null;
 }
 export default function Perfil() {
   const { itHasPassword, isLoggedIn, getCookie, traerDatosPerfil } = useAppContext(); // Assuming user data is available in the context
@@ -96,8 +100,8 @@ fetchData();
 
         <div className="flex justify-center">
           
-        <div className="bg-white border-gray-200 border-2 rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-8 md:flex-row flex flex-col ">
-          <div className="w-full md:w-1/2 pr-4 md:flex-row flex flex-col justify-center md:justify-around">
+        <div className="bg-white border-gray-300 border-2 mb-10 rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-8 md:flex-row flex flex-col flex-wrap ">
+          <div className="w-full md:w-1/2 pr-4 md:flex-row flex flex-col justify-center md:justify-around ">
             <div>
               <div className="mb-4">
                 <label className="block text-gray-700 font-bold">Calle:</label>
@@ -140,10 +144,17 @@ fetchData();
                 </label>
                 <span>{user?.PARTIDO ?? "" ? user?.PARTIDO : "-"}</span>
               </div>
+              <div className="mb-4">
+                <label className="block text-gray-700 font-bold">
+                  Entrecalles:
+                </label>
+                <span>{user?.ENTRE_CALLES ?? "" ? user?.ENTRE_CALLES : "-"}</span>
+
+              </div>
             </div>
           </div>
-          <div className="w-px bg-gray-200 mx-16"></div>
-          <div className="w-30 md:pl-4 mt-10 md:mt-0 mb-10 md:mb-0">
+          <div className="w-px bg-gray-300 h-2/3 lg:mx-16 md:mx-10"></div>
+          <div className="w-30 md:pl-4 mt-10 md:mt-0 md:mb-10 md:mb-0">
             <div className="mb-4 ">
               <label className="block text-gray-700 font-bold">CUIL:</label>
               <span>{user?.CUIL ?? "" ? user?.CUIL : "-"}</span>
@@ -163,7 +174,25 @@ fetchData();
               <span>{user?.TE ?? "" ? user?.TE : "-"}</span>
             </div>
           </div>
+
+          <div className="md:ml-10 w-full  md:pl-4 mt-10 md:mt-0 mb-10 md:mb-0 flex md:flex-row flex-col  md:justify-around">
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">
+                Calzado:
+              </label>
+              <span>{user?.CALZADO ?? "" ? user?.CALZADO : "-"}</span>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">Pantalón:</label>
+              <span>{user?.PANTALON ?? "" ? user?.PANTALON : "-"}</span>
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">Remera:</label>
+              <span>{user?.REMERA ?? "" ? user?.REMERA : "-"}</span>
+            </div>
+          </div>
         </div>
+
         </div>
       </div>)}
       </>)

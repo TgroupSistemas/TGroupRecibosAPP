@@ -14,10 +14,12 @@ import {
   getRegistroUnico,
   LbGetClases,
   LbRegistroClase,
+  traerNotificacionesNoLeidas,
   getRecibos,
   updateRecibo,
   updateCorreo,
   getTokenAPI,
+  updateNoti,
   mailUsuario,
   updateReciboComentario,
   postLog,
@@ -154,13 +156,13 @@ export const AppContextProvider = ({ children }) => {
           "; max-age=28800; path=/";
         setLoggedIn(true);
 
-        return true;
+        return 200;
       } else {
-        return false;
+        console.log("ERRORRR user mal", data);
+        return data.status;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
-      return false;
+      return error.status;
     }
   }, []);
   const logout = useCallback(async () => {
@@ -360,7 +362,6 @@ export const AppContextProvider = ({ children }) => {
         await getCookie("fl_erp_empresas")
       );
       if (data.status == 200) {
-        console.log(data, "ASDA");
         setLoadingNotificaciones(false);
         return data.datos;
       } else {
@@ -371,6 +372,28 @@ export const AppContextProvider = ({ children }) => {
       return false;
     }
   }, []);
+
+  const traerNumeroNotisNoLeidas = useCallback(async () => {
+    const headers = {
+      "content-type": "application/json; charset=utf-8",
+    };
+    try {
+      const data = await traerNotificacionesNoLeidas(
+        await getCookie("id"),
+        1,
+        await getCookie("fl_erp_empresas")
+      );
+      if (data.status == 200) {
+        return data.total;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("ERRORRR user mal", error);
+      return false;
+    }
+  }, []);
+
   const [loadingLicencias, setLoadingLicencias] = useState(false);
 
   const traerLicenciaUser = useCallback(async () => {
@@ -379,13 +402,25 @@ export const AppContextProvider = ({ children }) => {
     };
     try {
       setLoadingLicencias(true);
-      const data = await traerLicencias(
+      const dataPage1 = await traerLicencias(
         await getCookie("id"),
         1,
         await getCookie("fl_erp_empresas")
       );
+
+      const dataPage2 = await traerLicencias(
+        await getCookie("id"),
+        2,
+        await getCookie("fl_erp_empresas")
+      );
+
+      const combinedData = {
+        ...dataPage1,
+        datos: [...(dataPage1.datos || []), ...(dataPage2.datos || [])],
+      };
+      console.log(combinedData, "ASDA");
+      const data = combinedData;
       if (data.status == 200) {
-        console.log(data, "ASDA");
         setLoadingLicencias(false);
         return data.datos;
       } else {
@@ -574,6 +609,24 @@ export const AppContextProvider = ({ children }) => {
     []
   );
 
+  const updateNotificacion = useCallback(
+    async (notificacion) => {
+      try {
+        const data = await updateNoti(
+          notificacion.ID,
+          notificacion.ESTADO
+        );
+        if (data == 200) {
+        } else {
+          console.log("ERRORRR recibos");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    []
+  );
+
   const updateComentarioRecibo = useCallback(
     async (id, disconformidad, empresa) => {
       setRecibosFirmaLoading(true);
@@ -646,15 +699,16 @@ export const AppContextProvider = ({ children }) => {
 
     try {
       console.log(licenciaData);
+      const operacion = licenciaData.tipoLicencia === "U" ? "A" : "L";
       const data = await postLicencia({
         FK_WS_USUARIOS,
-        TIPO_LIC: licenciaData.tipoLicencia,
-        OPERACION: "L",
+        ...(licenciaData.tipoLicencia !== "U" && { TIPO_LIC: licenciaData.tipoLicencia }),
         NOTAS: licenciaData.notas,
+        OPERACION: operacion,
         FEC_HAS: licenciaData.selectionRange.endDate.toISOString(),
         FEC_DES: licenciaData.selectionRange.startDate.toISOString(),
         FK_WS_CLIENTES,
-        CANTIDAD: licenciaData.daysCount,
+        ...(licenciaData.tipoLicencia !== "U" && { CANTIDAD: licenciaData.daysCount }),
         FECHA_HORA: generarHora(),
         ARCHIVOS: licenciaData.ARCHIVOS,
       });
@@ -832,6 +886,7 @@ export const AppContextProvider = ({ children }) => {
         recibosFirmaLoading,
         getEmpresasHab,
         logLoading,
+        traerNumeroNotisNoLeidas,
         aceptarTerminos,
         getRecibosSinFirmar,
         recibosSinFirmarLoading,
@@ -855,6 +910,8 @@ export const AppContextProvider = ({ children }) => {
         imagenLoading,
         traerLicenciaUser,
         licenciaLoading,
+        updateNotificacion,
+        getEmpresaName
       }}
     >
       {children}
