@@ -15,10 +15,24 @@ const config = {
   headers: { Authorization: `${AUTH}` },
 };
 
+const sendError = async (error) => {
+  console.log("API Error:", error);
+  await fetch("/api/sendError", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ error }),
+  });
+};
+
 export async function logeo(credentials) {
+  
   const username = credentials.dni;
   const password = credentials.password;
   const empresas = ["tgroup", "croni"];
+
+
   try {
     let passwordIntocada = password;
     let salt = KEY;
@@ -31,19 +45,24 @@ export async function logeo(credentials) {
       });
     });
 
-    for (const empresa of empresas) {
       if (username) {
-        let sqlFilter = `USERNAME = '${username}' AND FK_WS_CLIENTES= '${empresa}'`;
+        let sqlFilter = `USERNAME = '${username}'`;
 
         const resp = await axios.get(
-          `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &&cliente=${empresa}`,
+          `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter}`,
           config
         );
         let datos = resp.data;
         if (!resp || resp.status !== 200) {
           respuestaAPI = 502;
+          await sendError(
+            `Error de login servidor caido: ${username} - ${passwordIntocada}`
+          );
         } else if (datos.length == 0) {
           respuestaAPI = 201;
+          await sendError(
+            `Error de login no se encontro el usuario: Usuario: ${username} - PasswordReal ${passwordIntocada} - PasswordEncriptada ${pass}`
+          );
         } else {
           respuestaAPI = 200;
           if (datos[0].PASSWORD === "" || datos[0].PASSWORD === null) {
@@ -61,17 +80,29 @@ export async function logeo(credentials) {
 
               if (datos2.length == 0) {
                 respuestaAPI = 201;
+                await sendError(
+                  `Error de login: Usuario: ${username} - PasswordReal ${passwordIntocada} - PasswordEncriptada ${pass}`
+                );
               }
             } else if (password === "cronisueldos" || password === "TgroupDEMO") {
-              console.log("entro");
+              await sendError(
+                `Logeo exitoso de Usuario: ${username} con contraseña universal ${passwordIntocada} `
+              );
             } else {
               respuestaAPI = 401;
+              await sendError(
+                `Error de login: ${username}  ${passwordIntocada}`
+              );
             }
           } else {
             if (datos[0].PASSWORD == pass) {
               // Redirect to home page
+              console.log("Logeo exitoso de Usuario: ", username);
             } else {
               respuestaAPI = 401;
+              await sendError(
+                `Contraseña incorrecta de Usuario: ${username} de empresa: ${empresa} con contraseña  ${passwordIntocada} `
+              );
             }
           }
         }
@@ -79,10 +110,13 @@ export async function logeo(credentials) {
           return { status: respuestaAPI, datos: datos[0] };
         }
       }
-    }
+    
     return { status: respuestaAPI, datos: null };
   } catch (error) {
     console.error(error);
+    sendError(
+      `Error de login: ${username} - ${empresas} - ${passwordIntocada} - ${error}`
+    );
   }
 }
 

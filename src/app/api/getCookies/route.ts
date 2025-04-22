@@ -30,7 +30,6 @@ const decrypt = (text: string): string => {
       const encryptedValue = cookie;
       if (encryptedValue) {
         const decryptedValue = decrypt(cookie);
-        console.log(cookie, method,decryptedValue)
 
         return NextResponse.json({ value: decryptedValue });
       } else {
@@ -39,7 +38,6 @@ const decrypt = (text: string): string => {
     } else if (method === 'encrypt') {
       try {
         const encryptedValue = encrypt(cookie);
-        console.log(cookie, method,encryptedValue)
 
         return NextResponse.json({ value: encryptedValue });
       } catch (error) {

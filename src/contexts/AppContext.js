@@ -36,7 +36,7 @@ import {
 import bcrypt from "bcrypt-nodejs";
 import dotenv from "dotenv";
 import { get } from "http";
-import { env } from "process";
+import { env, send } from "process";
 dotenv.config();
 
 const AppContext = createContext();
@@ -339,7 +339,6 @@ export const AppContextProvider = ({ children }) => {
     try {
       const data = await datosUsuario(dni, await getCookie("fl_erp_empresas"));
       if (data.status == 200) {
-        console.log(data, "ASDA");
         return data.datos;
       } else {
         return false;
@@ -472,7 +471,6 @@ export const AppContextProvider = ({ children }) => {
     }
   }, []);
 
-  //tolis
   const changePassword = useCallback(async (credentials) => {
     const fl_erp_empresas = await getCookie("fl_erp_empresas");
     const id = await getCookie("id");
@@ -690,6 +688,17 @@ export const AppContextProvider = ({ children }) => {
     },
     []
   );
+
+  const sendError = async (error) => {
+    await fetch("/api/sendError", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ error }),
+    });
+  };
+
   const [licenciaLoading, setLicenciaLoading] = useState(false);
   const licenciaPost = useCallback(async (licenciaData) => {
     setLicenciaLoading(true);
@@ -911,7 +920,8 @@ export const AppContextProvider = ({ children }) => {
         traerLicenciaUser,
         licenciaLoading,
         updateNotificacion,
-        getEmpresaName
+        getEmpresaName,
+        sendError,
       }}
     >
       {children}
