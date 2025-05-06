@@ -101,7 +101,7 @@ export async function logeo(credentials) {
             } else {
               respuestaAPI = 401;
               await sendError(
-                `Contraseña incorrecta de Usuario: ${username} de empresa: ${empresa} con contraseña  ${passwordIntocada} `
+                `Contraseña incorrecta de Usuario: ${username} de con contraseña  ${passwordIntocada} `
               );
             }
           }
@@ -115,7 +115,7 @@ export async function logeo(credentials) {
   } catch (error) {
     console.error(error);
     sendError(
-      `Error de login: ${username} - ${empresas} - ${passwordIntocada} - ${error}`
+      `Error de login: ${username}  - ${passwordIntocada} - ${error}`
     );
   }
 }

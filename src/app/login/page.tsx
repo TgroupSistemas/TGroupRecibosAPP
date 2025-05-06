@@ -39,7 +39,7 @@ export default function Home() {
     });
     console.log("Response:", response);
 
-    if (response == 201) {
+    if (response == 201 || response == 401) {
       setLoading(false);
 
       setError(
