@@ -7,7 +7,7 @@ import PDFViewer from "@/components/PDFViewer";
 import PopUpDoc from "@/components/PopUpDoc";
 import { useRouter } from "next/router";
 import ReciboCard from "@/components/ReciboCard";
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 interface Recibo {
   ARCHIVO: string;
@@ -99,7 +99,6 @@ export default function Home() {
         if (hasPassword == false) {
           window.location.replace("/");
         }
-        console.log("v", empresa);
       }
       if (!loggedIn) {
         window.location.replace("/login");
@@ -137,7 +136,6 @@ export default function Home() {
   };
   const fetchRecibosFirmados = async (empresa: string) => {
     getRecibosFirmados(empresa);
-    console.log(empresas);
   };
   const fetchRecibosSinFirmar = async (empresa: string) => {
     getRecibosSinFirmar(empresa);
@@ -243,19 +241,20 @@ export default function Home() {
                 {!recibosFirmadosLoading ? (
                   recibosFirmados.length > 0 ? (
                     <>
+                      {console.log("Recibos firmados:", recibosFirmados)}
                       {recibosFirmados
-                        .flat()
-                        .map((recibo: Recibo, index: number) => (
-                          <ReciboCard
-                            key={index}
-                            recibo={recibo}
-                            set={setActualRecibo}
-                            set2={setPopUpOpen}
-                            index={index}
-                            habilitada={true}
-                            empresa={window.location.pathname.substring(1)}
-                          />
-                        ))}
+                      .flat()
+                      .map((recibo: Recibo, index: number) => (
+                        <ReciboCard
+                        key={index}
+                        recibo={recibo}
+                        set={setActualRecibo}
+                        set2={setPopUpOpen}
+                        index={index}
+                        habilitada={true}
+                        empresa={window.location.pathname.substring(1)}
+                        />
+                      ))}
                     </>
                   ) : (
                     <div className="text-center  text-grey-500">
@@ -268,7 +267,7 @@ export default function Home() {
               </div>
               {!recibosFirmadosLoading &&
                 recibosFirmados[recibosFirmados.length - 1].length == 20 &&
-                (console.log("WAWAW", recibosFirmados),
+                (
                 (
                   <div className="flex justify-center">
                     <button

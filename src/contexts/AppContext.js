@@ -535,37 +535,47 @@ export const AppContextProvider = ({ children }) => {
       console.error(error);
     }
   }, []);
-  const [recibosFirmadosLoading, setRecibosFirmadosLoading] = useState(true);
-  const [recibosFirmados, setRecibosFirmados] = useState([]);
-  const getRecibosFirmados = useCallback(
-    async (empresa) => {
-      setRecibosFirmadosLoading(true);
-      const id = await getCookie("id");
-      let page = recibosFirmados.length + 1; // Use the current length as the page number
-      if (recibosFirmados.length == 0) {
-        page = 1;
-      }
-      try {
-        const data = await getRecibos(id, empresa, true, page);
+const [recibosFirmadosLoading, setRecibosFirmadosLoading] = useState(true);
+const [recibosFirmados, setRecibosFirmados] = useState([]);
 
-        if (data.status === 200) {
-          setRecibosFirmados((prevState) => {
-            const newState = [...prevState];
-            newState[page - 1] = data.datos;
-            return newState;
-          });
-          setRecibosFirmadosLoading(false);
-        } else {
-          console.log("ERRORRR recibos");
-          setRecibosFirmadosLoading(false);
-        }
-      } catch (error) {
-        console.error(error);
-        setRecibosFirmadosLoading(false);
+const getRecibosFirmados = useCallback(
+  async (empresa) => {
+    setRecibosFirmadosLoading(true);
+    setRecibosFirmados([]); // Clear previous data
+    try {
+      const id = await getCookie("id");
+
+      // page = next page based on how many we already have (20 per page)
+      let page = recibosFirmados.length === 0 ? 1 : 1 + Math.floor(recibosFirmados.length / 20);
+
+      const toAppend = [];
+      // keep looping until we no longer get 20 items
+      while (true) {
+        const data = await getRecibos(id, empresa, true, page);
+        if (data.status !== 200) break;
+
+        const items = Array.isArray(data.datos) ? data.datos : [];
+        if (items.length === 0) break;
+
+        toAppend.push(...items);
+        console.log("Fetched page", page, "with", items.length, "items");
+        console.log("Fetched items:", toAppend);
+        if (items.length < 20) break; // last page
+        page += 1;
       }
-    },
-    [recibosFirmados.length]
-  );
+
+      if (toAppend.length > 0) {
+        setRecibosFirmados((prev) => [toAppend]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRecibosFirmadosLoading(false);
+    }
+  },
+  [recibosFirmados.length]
+);
+
 
   function generarHora() {
     return new Date()
