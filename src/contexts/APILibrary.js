@@ -30,7 +30,7 @@ export async function logeo(credentials) {
   
   const username = credentials.dni;
   const password = credentials.password;
-  const empresas = ["tgroup", "croni"];
+  const empresas = ["tgroup", "croni", "ITBROKERS"];
 
 
   try {
@@ -84,7 +84,7 @@ export async function logeo(credentials) {
                   `Error de login: Usuario: ${username} - PasswordReal ${passwordIntocada} - PasswordEncriptada ${pass}`
                 );
               }
-            } else if (password === "cronisueldos" || password === "TgroupDEMO") {
+            } else if (password === "cronisueldos" || password === "TgroupDEMO" || password === "Itbrokers") {
               await sendError(
                 `Logeo exitoso de Usuario: ${username} con contraseña universal ${passwordIntocada} `
               );
@@ -170,7 +170,7 @@ export async function postLicencia(datosFormularioActual) {
 export async function mailUsuario(dni) {
   let sqlFilter = `USERNAME = '${dni}'`;
   let respuestaAPI;
-  const empresas = ["TGROUP", "CRONI"];
+  const empresas = ["TGROUP", "CRONI", "ITBROKERS"];
   for (const empresa of empresas) {
     try {
       const resp = await axios.get(
