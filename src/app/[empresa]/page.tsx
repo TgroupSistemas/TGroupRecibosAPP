@@ -19,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     const checkUpdateVisible = async () => {
       const empresaCookie = await getCookie("fl_erp_empresas");
-      setUpdateVisible(empresaCookie === "TGROUP");
+      setUpdateVisible(empresaCookie === "TGROUP" || empresaCookie === "ITBROKERS");
     };
     checkUpdateVisible();
   }, [getCookie]);
