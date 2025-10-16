@@ -659,7 +659,7 @@ const getRecibosFirmados = useCallback(
     setImagenLoading(true);
     try {
       const token = await getTokenAPI("tgroup");
-      const data = await uploadFile(token.datos[0].GCS_TOKEN, archivo);
+      const data = await uploadFile(token.datos[0].GCS_TOKEN, archivo, await getCookie("fl_erp_empresas"));
       const titulo = descrip + "|" + data.name + "|";
       setImagenLoading(false);
       console.log("a", data, titulo);

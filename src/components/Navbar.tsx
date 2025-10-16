@@ -46,7 +46,15 @@ export default function Navbar() {
                 name.split(" ")[0].charAt(0).toUpperCase() +
                 name.split(" ")[0].slice(1).toLowerCase()}
             </li>
-            {updateVisible && (
+
+            <div className="flex mt-2 md:mt-0">
+            <Link
+              href="/perfil"
+              className="block text-center px-2 text-lg no-underline verdetg font-semibold"
+            >
+              <FontAwesomeIcon icon={faUser} className="mr-2" />
+            </Link>
+                        {updateVisible && (
               <div className="relative">
               <Link
                 href="/notificaciones"
@@ -61,13 +69,6 @@ export default function Navbar() {
               )}
               </div>
             )}
-            <div className="flex mt-2 md:mt-0">
-            <Link
-              href="/perfil"
-              className="block text-center px-4 text-lg no-underline verdetg font-semibold"
-            >
-              <FontAwesomeIcon icon={faUser} className="mr-2" />
-            </Link>
             <li className="block text-center text-lg px-3 no-underline verdetg">
               <a className="lis" href="#" onClick={() => setOpen(true)}>
                 <FontAwesomeIcon icon={faArrowRightFromBracket} />

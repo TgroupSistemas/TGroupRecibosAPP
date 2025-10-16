@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useAppContext } from "@/contexts/AppContext";
 import NotificationCard from "@/components/NotificationCard";
 import PopUpNotification from "@/components/PopUpNotification";
+import Link from "next/link";
 export default function Home() {
     const {
       traerNotificacionesUser,
@@ -25,7 +26,13 @@ export default function Home() {
     <UpdateTriggerProvider>
       <Navbar></Navbar>
       <section className="pt-40 md:pt-20">
-        <div className="container mx-auto  bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg">
+        <div className="container mx-auto  bg-white p-5 md:p-8 md:mt-10 mt-1 rounded-lg shadow-lg my-7 lg:my-0">
+          <Link href="/" className="inline-flex items-center px-1 text-lg no-underline text-md mb-2 mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver 
+          </Link>
           <div className="text-center mb-2">
             <h1 className="sm:text-3xl text-2xl mb-6 font-medium title-font text-gray-900">
               Notificaciones

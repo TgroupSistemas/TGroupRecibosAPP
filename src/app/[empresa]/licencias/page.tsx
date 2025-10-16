@@ -180,9 +180,8 @@ const Home = () => {
                     <option value="Z">Mudanza</option>
                     <option value="D">Donación de sangre</option>
                     <option value="X">Estudio/examen</option>
-                    <option value="C">Enfermedad/accidente</option>
-                    <option value="P">Maternidad/paternidad</option>
                     <option value="T">Tareas gremiales</option>
+                    <option value="null" disabled className="text-gray-500">─── Otro ───</option>
                     <option value="O">Otras</option>
                   </select>
                 </div>

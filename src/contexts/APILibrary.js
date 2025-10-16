@@ -451,10 +451,10 @@ export async function getTokenAPI(empresa) {
   }
 }
 
-export async function uploadFile(token, file) {
+export async function uploadFile(token, file, empresa) {
     console.log(file, token);
   try {
-    const response = await fetch(`${PDF_URL_UPLOAD}tgroup_recibos/o?name=TGROUP_FILES/${file.name}&uploadType=media`, {
+    const response = await fetch(`${PDF_URL_UPLOAD}tgroup_recibos/o?name=${empresa.toUpperCase()}_FILES/${file.name}&uploadType=media`, {
       method: "POST",
       body: file,
       headers: {

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import { UpdateTriggerProvider } from "@/app/context"; // Import the UpdateTriggerProvider
 import { useAppContext } from "@/contexts/AppContext";
+import Link from "next/link";
 interface UserData {
   CALLE: string | null;
   CELULARES: string | null;
@@ -86,6 +87,12 @@ fetchData();
       ) : (
       <div className="container mx-auto pt-48 md:pt-38 ">
         <div className="flex flex-col text-center w-full mb-16 ">
+          <Link href="/" className="inline-flex items-center px-1 text-lg no-underline text-md mb-2 mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Volver 
+          </Link>
           <h4 className=" text-indigo-500 tracking-widest font-medium title-font mb-1">
           {user?.CUIL ?? "" ? user?.CUIL : "-"}
           </h4>
@@ -100,7 +107,7 @@ fetchData();
 
         <div className="flex justify-center">
           
-        <div className="bg-white border-gray-300 border-2 mb-10 rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-8 md:flex-row flex flex-col flex-wrap ">
+        <div className="bg-white border-gray-300 border-2 mb-10 rounded-lg lg:w-4/6 md:w-5/6  mt-5 p-8 md:flex-row flex flex-col  flex-nowrap md:flex-wrap ">
           <div className="w-full md:w-1/2 pr-4 md:flex-row flex flex-col justify-center md:justify-around ">
             <div>
               <div className="mb-4">
