@@ -78,7 +78,7 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
   return (
     <div
       key={index}
-      className={`flex items-center bg-gray-200 md:h-24 h-48 rounded-xl mb-2 pr-4 border-l-4 ${estadoMeta[estado].border}`}
+      className={`flex items-center bg-gray-200 md:h-24 h-48 rounded-xl mb-2 pr-4 border-l-4 }`}
     >
       <div
         className={`text-white font-semibold text-sm md:text-base h-full flex rounded-l-xl w-36 md:w-36 p-2 text-center justify-center items-center ${estadoMeta[estado].sideBg}`}
