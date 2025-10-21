@@ -1,32 +1,10 @@
 import React from "react";
 import { useAppContext } from "@/contexts/AppContext";
-import { differenceInDays, set } from "date-fns";
-
-/*
-interface Recibo {
-  ARCHIVO: string;
-  ESTADO_FIRMA: string;
-  FECHA_ESTADO_FIRMA: string ;
-  FEC_ULT_ACT: string;
-  FK_SUE_LIQUIDACIONES: number;
-  FK_WS_CLIENTES: string;
-  FK_WS_USUARIOS: string;
-  ID: string;
-  MOTIVO_DISCONFORMIDAD: string;
-  NUM_RECIBO: number;
-  PERIODO: string;
-  STATUS_API: string;
-  TIP_LIQ: string;
-}*/
+import { differenceInDays } from "date-fns";
 
 interface NotificationCardProps {
-  //recibo: Recibo;
   index: number;
   notificacion: any;
-  /*set: React.Dispatch<React.SetStateAction<Recibo>>;
-  set2: React.Dispatch<React.SetStateAction<boolean>>;
-  habilitada: boolean;
-  empresa: string;*/
   setNotiAbierta: React.Dispatch<React.SetStateAction<number>>;
   setNotiEstado: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -38,74 +16,144 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
   setNotiEstado,
 }) => {
   const { postLogRecibo, getCookie } = useAppContext();
+
   const handleClick = async () => {
     setNotiAbierta(index);
     setNotiEstado(true);
   };
 
-  const cardClassName = `btn border-none text-white   w-28  "bg-slate-500"`;
-  const cardClassSide = ` text-white font-semibold text-sm md:text-base h-full flex rounded-l-xl w-36 md:w-36 p-2 text-center justify-center items-center bg-grisclaro `;
+  // --- Estado & Colores ------------------------------------------------------
+  type EstadoNorm = "pendiente" | "autorizado" | "rechazado";
+
+  const normalizeEstado = (raw: any): EstadoNorm => {
+    if (raw === null || raw === undefined) return "pendiente";
+    const s = String(raw).trim().toLowerCase();
+    if (s === "p" || s.startsWith("pend")) return "pendiente";
+    if (s === "a" || s.startsWith("autor")) return "autorizado";
+    if (s === "x" || s.startsWith("recha")) return "rechazado";
+    return "pendiente";
+  };
+
+  const estado = normalizeEstado(notificacion?.ESTADO_ERP);
+
+  const estadoMeta: Record<
+    EstadoNorm,
+    {
+      label: string;
+      badge: string;
+      badgeText: string;
+      sideBg: string;
+    }
+  > = {
+    pendiente: {
+      label: "Pendiente",
+      badge: "bg-gray-500",
+      badgeText: "text-white",
+      sideBg: "bg-gray-400",
+    },
+    autorizado: {
+      label: "Autorizado",
+      badge: "bg-green-600",
+      badgeText: "text-white",
+      sideBg: "bg-green-600",
+    },
+    rechazado: {
+      label: "Rechazado",
+      badge: "bg-red-600",
+      badgeText: "text-white",
+      sideBg: "bg-red-600",
+    },
+  };
+
+  const sameDay =
+    new Date(notificacion.FEC_DES).toLocaleDateString() ===
+    new Date(notificacion.FEC_HAS).toLocaleDateString();
+
+  const rangoDias =
+    differenceInDays(
+      new Date(notificacion.FEC_HAS),
+      new Date(notificacion.FEC_DES)
+    ) + 1;
+
   return (
     <div
       key={index}
-      className={`flex  items-center bg-gray-200 md:h-24 h-40 rounded-xl mb-2 pr-4`}
+      className={`flex items-center bg-gray-200 md:h-24 h-48 rounded-xl mb-2 pr-4 border-l-4 ${estadoMeta[estado].border}`}
     >
-      <div className={cardClassSide}>
-        {notificacion.OPERACION === 'A' 
-          ? "DOC" 
-          : `${differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1} ${
-              differenceInDays(new Date(notificacion.FEC_HAS), new Date(notificacion.FEC_DES)) + 1 === 1 ? "día" : "días"
-            }`}
+      <div
+        className={`text-white font-semibold text-sm md:text-base h-full flex rounded-l-xl w-36 md:w-36 p-2 text-center justify-center items-center ${estadoMeta[estado].sideBg}`}
+      >
+        {notificacion.OPERACION === "A"
+          ? "DOC"
+          : `${rangoDias} ${rangoDias === 1 ? "día" : "días"}`}
       </div>
-      <div className=" md:flex md:justify-between md:w-full pl-4 md:pl-6 md:items-center ">
-        <div className="text-black font-bold mb-5 md:mb-0 text-left">
-            {(() => {
-            if (notificacion.OPERACION === 'A') {
+
+      <div className="md:flex md:justify-between md:w-full pl-4 md:pl-6 md:items-center w-full">
+        <div className="text-black font-bold mb-3 md:mb-0 text-left">
+          {(() => {
+            if (notificacion.OPERACION === "A") {
               return "Documentación";
             }
             switch (notificacion.TIPO_LIC) {
               case "V":
-              return "Vacaciones";
+                return "Vacaciones";
               case "E":
-              return "Enfermedad";
+                return "Enfermedad";
               case "A":
-              return "Accidente";
+                return "Accidente";
               case "M":
-              return "Matrimonio";
+                return "Matrimonio";
               case "N":
-              return "Nacimiento de hijo/adopción";
+                return "Nacimiento de hijo/adopción";
               case "F":
-              return "Fallecimiento de familiar";
+                return "Fallecimiento de familiar";
               case "Z":
-              return "Mudanza";
+                return "Mudanza";
               case "D":
-              return "Donación de sangre";
+                return "Donación de sangre";
               case "X":
-              return "Estudio/examen";
+                return "Estudio/examen";
               case "C":
-              return "Enfermedad/accidente";
+                return "Enfermedad/accidente";
               case "P":
-              return "Maternidad/paternidad";
+                return "Maternidad/paternidad";
               case "T":
-              return "Tareas gremiales";
+                return "Tareas gremiales";
               case "O":
-              return "Otras";
+                return "Otras";
               default:
-              return "Desconocido";
+                return "Desconocido";
             }
-            })()}
-            
-            <p className="text-gray-400">{new Date(notificacion.FEC_DES).toLocaleDateString() === new Date(notificacion.FEC_HAS).toLocaleDateString()
-          ? new Date(notificacion.FEC_DES).toLocaleDateString()
-          : `${new Date(notificacion.FEC_DES).toLocaleDateString()} - ${new Date(notificacion.FEC_HAS).toLocaleDateString()}`}</p>
-        </div>{" "}
-        <div className="flex space-x-2 ">
+          })()}
+
+          <div className="mt-1 flex md:items-center gap-2 flex-col md:flex-row">
+            <p className="text-gray-400">
+              {sameDay
+                ? new Date(notificacion.FEC_DES).toLocaleDateString()
+                : `${new Date(
+                    notificacion.FEC_DES
+                  ).toLocaleDateString()} - ${new Date(
+                    notificacion.FEC_HAS
+                  ).toLocaleDateString()}`}
+            </p>
+
+            {/* Estado badge */}
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold w-min ${estadoMeta[estado].badge} ${estadoMeta[estado].badgeText}`}
+              title={`Estado: ${estadoMeta[estado].label}`}
+            >
+              {estadoMeta[estado].label}
+            </span>
+          </div>
+        </div>
+
+        <div className="flex space-x-2">
           <button
-            className={`btn border-none btn-primary text-white w-36  bg-grisclaro2 hover:bg-grisclaro `}
+            className="btn border-none btn-primary text-white w-28 bg-gray-500 hover:bg-gray-400"
             onClick={handleClick}
             disabled={false}
           >
-            Leer detalle
+            Ver
           </button>
         </div>
       </div>

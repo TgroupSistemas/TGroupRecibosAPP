@@ -393,7 +393,7 @@ export const AppContextProvider = ({ children }) => {
     }
   }, []);
 
-  const [loadingLicencias, setLoadingLicencias] = useState(false);
+  const [loadingLicencias, setLoadingLicencias] = useState(true);
 
   const traerLicenciaUser = useCallback(async () => {
     const headers = {
@@ -730,6 +730,7 @@ const getRecibosFirmados = useCallback(
         ...(licenciaData.tipoLicencia !== "U" && { CANTIDAD: licenciaData.daysCount }),
         FECHA_HORA: generarHora(),
         ARCHIVOS: licenciaData.ARCHIVOS,
+        ESTADO_ERP: 'P'
       });
       console.log(data);
       if (data.status == 200) {
@@ -932,6 +933,7 @@ const getRecibosFirmados = useCallback(
         updateNotificacion,
         getEmpresaName,
         sendError,
+        loadingLicencias
       }}
     >
       {children}
