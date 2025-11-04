@@ -85,10 +85,10 @@ export default function Home() {
     const fetchData = async () => {
       setVerifLoading(true);
       if (typeof window !== "undefined") {
-        const empresa = window.location.pathname
-          .replace("/recibos", "")
-          .substring(1);
-        setEmpresa(window.location.pathname.substring(1));
+const empresa = window.location.pathname
+  .replace("/recibos", "")
+  .substring(1);
+setEmpresa(empresa); // ✅ sólo "empresa"
         fetchname();
         fetchRecibosSinFirmar(empresa);
         fetchRecibosFirmados(empresa);
@@ -265,23 +265,25 @@ export default function Home() {
                   <div></div>
                 )}
               </div>
-              {!recibosFirmadosLoading &&
-                recibosFirmados[recibosFirmados.length - 1].length == 20 &&
-                (
-                (
-                  <div className="flex justify-center">
-                    <button
-                      className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200"
-                      onClick={() =>
-                        fetchRecibosFirmados(
-                          window.location.pathname.substring(1)
-                        )
-                      }
-                    >
-                      Ver más recibos
-                    </button>
-                  </div>
-                ))}
+              {!recibosFirmadosLoading && (() => {
+  // última "página" de resultados (si el backend pagina de a 20)
+  const lastPage = recibosFirmados?.[recibosFirmados.length - 1];
+  const shouldShowLoadMore =
+    Array.isArray(lastPage) && lastPage.length === 20;
+
+  if (!shouldShowLoadMore) return null;
+
+  return (
+    <div className="flex justify-center">
+      <button
+        className="px-10 py-2 bg-gray-300 rounded-lg mt-5 text-md text-green-800 hover:bg-gray-200"
+        onClick={() => fetchRecibosFirmados(empresaSt)}
+      >
+        Ver más recibos
+      </button>
+    </div>
+  );
+})()}
             </div>
           </section>
           {popUpOpen && (
