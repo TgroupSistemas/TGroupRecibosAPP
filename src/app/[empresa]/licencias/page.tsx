@@ -216,6 +216,7 @@ const [adjuntoObligatorio, setAdjuntoObligatorio] = useState(false);
                     <option value="H">Examen Nivel Medio</option>
                     <option value="I">Examen Nivel Universitario</option>
                     <option value="J">Citación Judicial</option>
+                    <option value="C">Llegada demorada/salida anticipada justificada</option>
 
                     <option value="null" disabled className="text-gray-500">
                       ─── Otro ───

@@ -94,36 +94,44 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
             if (notificacion.OPERACION === "A") {
               return "Documentación";
             }
-            switch (notificacion.TIPO_LIC) {
-              case "V":
-                return "Vacaciones";
-              case "E":
-                return "Enfermedad";
-              case "A":
-                return "Accidente";
-              case "M":
-                return "Matrimonio";
-              case "N":
-                return "Nacimiento de hijo/adopción";
-              case "F":
-                return "Fallecimiento de familiar";
-              case "Z":
-                return "Mudanza";
-              case "D":
-                return "Donación de sangre";
-              case "X":
-                return "Estudio/examen";
-              case "C":
-                return "Enfermedad/accidente";
-              case "P":
-                return "Maternidad/paternidad";
-              case "T":
-                return "Tareas gremiales";
-              case "O":
-                return "Otras";
-              default:
-                return "Desconocido";
-            }
+switch (notificacion.TIPO_LIC) {
+  case "V":
+    return "Vacaciones";
+  case "E":
+    return "Enfermedad";
+  case "A":
+    return "Accidente";
+  case "M":
+    return "Matrimonio";
+  case "N":
+    return "Nacimiento de hijo/adopción";
+  case "F":
+    return "Fallecimiento de familiar";
+  case "Z":
+    return "Mudanza";
+  case "D":
+    return "Donación de sangre";
+  case "X":
+    return "Estudio/examen";
+  case "T":
+    return "Tareas gremiales";
+  case "K":
+    return "Día trabajado no fichado";
+  case "B":
+    return "Trámites Personales";
+  case "G":
+    return "Excedencia Maternidad";
+  case "H":
+    return "Examen Nivel Medio";
+  case "I":
+    return "Examen Nivel Universitario";
+  case "J":
+    return "Citación Judicial";
+  case "C":
+    return "Llegada demorada/salida anticipada justificada";
+  default:
+    return "Desconocido";
+}
           })()}
 
           <div className="mt-1 flex md:items-center gap-2 flex-col md:flex-row">
