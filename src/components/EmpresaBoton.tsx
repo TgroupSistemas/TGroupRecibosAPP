@@ -8,6 +8,7 @@ interface agregarProps {
 }
 export default function EmpresaBoton(props: agregarProps) {
 
+  console.log("EmpresaBoton render for empresa:", props.empresa, "destino:", props.destino);
 
     return (
         <Link className="w-full md:w-1/3" href={"/" + props.destino}>

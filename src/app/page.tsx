@@ -69,6 +69,7 @@ export default function Home() {
   const fetchEmpresas = async () => {
     setLoadingEmpresa(true);
     const username2 = await getEmpresasHab2();
+    console.log("Empresas habilitadas:", username2);
     setEmpresa(username2 as Empresa[]);
     setLoadingEmpresa(false);
   };

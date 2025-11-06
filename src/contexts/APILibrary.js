@@ -386,7 +386,7 @@ function generateSqlFilter2(da) {
 
   // Construct the filter string
   const filterString = fkWsClientesValues
-    .map((value) => `CODIGO LIKE '%${value}%'`)
+    .map((value) => `ID LIKE '%${value}%'`)
     .join(" OR ");
 
   return filterString;
@@ -397,9 +397,10 @@ export async function traerEmpresas(filtro, empresa) {
     ? `&sqlFilter=${encodeURIComponent(generateSqlFilter2(filtro))}`
     : "";
   const resp = await axios.get(
-    `${URL}/clases/WS_EMPRESAS_TGR?cliente=tgroup${sqlFilter}`,
+    `${URL}/clases/WS_CLIENTES?cliente=tgroup${sqlFilter}`,
     config
   );
+  console.log("TraerEmpresas - URL:", `${URL}/clases/WS_CLIENTES?cliente=tgroup${sqlFilter}`, "Response Data:", resp.data);
   return { status: 200, datos: resp.data };
 }
 
