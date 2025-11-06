@@ -28,7 +28,7 @@ export default function MailPassword(props: mailProps) {
         }
       }
     }
-    return 0;
+    return 3;
   });
 
   const [email, setEmail] = useState("");

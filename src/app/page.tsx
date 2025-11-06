@@ -111,7 +111,7 @@ export default function Home() {
         }
         const logged = await isLoggedIn();
         const hasPassword = await itHasPassword();
-        setHasPass(hasPassw);
+        setHasPass(hasPassword);
 
         if (logged == false) {
           window.location.replace("/login");
@@ -151,6 +151,7 @@ export default function Home() {
 
   // Show the notif popup only when MailPassword is NOT visible, unread > 0, and not dismissed
   const showNotifPopup = !showMailPassword && unreadNotis > 0 && !notifDismissed;
+
 
   return (
     <UpdateTriggerProvider>
@@ -217,11 +218,11 @@ export default function Home() {
 
             {(mailVerificado != "true" ||
               tycState != "true" ||
-              hasPassw == false ||
+              hasPass == false ||
               (verificaDatos != "F" && verificaDatos != "X")) &&
               !mailLoading && (
                 <MailPassword
-                  hasPass={hasPassw}
+                  hasPass={hasPass}
                   mail={mail}
                   mailv={mailVerificado}
                   tyc={tycState}
