@@ -16,7 +16,6 @@ export default function ChangePassword(props: mailProps) {
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    console.log(password, confirmPassword);
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");

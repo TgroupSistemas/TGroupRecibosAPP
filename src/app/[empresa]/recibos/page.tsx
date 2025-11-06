@@ -129,7 +129,6 @@ setEmpresa(empresa); // ✅ sólo "empresa"
     const username2 = JSON.parse(username) as Empresa[];
     setEmpresas(JSON.parse(username) as Empresa[]);
     setLoadingEmpresa(false);
-    console.log("a", empresas, empresaSt, username);
     setLegajo(
       username2.find((e) => e.FK_WS_CLIENTES == empresaSt)?.FK_SUE_LEGAJOS || 0
     );
@@ -241,7 +240,6 @@ setEmpresa(empresa); // ✅ sólo "empresa"
                 {!recibosFirmadosLoading ? (
                   recibosFirmados.length > 0 ? (
                     <>
-                      {console.log("Recibos firmados:", recibosFirmados)}
                       {recibosFirmados
                       .flat()
                       .map((recibo: Recibo, index: number) => (

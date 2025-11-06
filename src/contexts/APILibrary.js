@@ -16,7 +16,6 @@ const config = {
 };
 
 const sendError = async (error) => {
-  console.log("API Error:", error);
   await fetch("/api/sendError", {
     method: "POST",
     headers: {
@@ -30,7 +29,6 @@ export async function logeo(credentials) {
   
   const username = credentials.dni;
   const password = credentials.password;
-  const empresas = ["tgroup", "croni", "ITBROKERS"];
 
 
   try {
@@ -66,17 +64,18 @@ export async function logeo(credentials) {
         } else {
           respuestaAPI = 200;
           if (datos[0].PASSWORD === "" || datos[0].PASSWORD === null) {
-            if (password.includes(";")) {
-              const [part1, part2] = password.split(";");
+            if (password.includes("*12*45")) {
+              const part1 = password.replace("*12*45", "");
 
-              let sqlFilter2 = `ID = '${part1}' AND ID_CLIENTE= '${part2}'`;
+              let sqlFilter2 = `ID='${part1}'`;
 
               const resp2 = await axios.get(
-                `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2}`,
+                `${URL}/clases/WS_CLIENTES?sqlFilter=${sqlFilter2}&&cliente=${datos[0].FK_WS_CLIENTES}`,
                 config
               );
+
+
               let datos2 = resp2.data;
-              console.log(datos2);
 
               if (datos2.length == 0) {
                 respuestaAPI = 201;
@@ -97,7 +96,6 @@ export async function logeo(credentials) {
           } else {
             if (datos[0].PASSWORD == pass) {
               // Redirect to home page
-              console.log("Logeo exitoso de Usuario: ", username);
             } else {
               respuestaAPI = 401;
               await sendError(
@@ -151,7 +149,6 @@ export async function postLicencia(datosFormularioActual) {
         Authorization: `${AUTH}`,
       },
     };
-    console.log(datosFormularioActual);
     const axiosResponse = await axios.post(
       `${URL}/clases/Ws_NOTIFICACIONES?cliente=${datosFormularioActual.FK_WS_CLIENTES}`,
       JSON.stringify(datosFormularioActual),
@@ -452,7 +449,6 @@ export async function getTokenAPI(empresa) {
 }
 
 export async function uploadFile(token, file, empresa) {
-    console.log(file, token);
   try {
     const response = await fetch(`${PDF_URL_UPLOAD}tgroup_recibos/o?name=${empresa.toUpperCase()}_FILES/${file.name}&uploadType=media`, {
       method: "POST",
@@ -467,7 +463,6 @@ export async function uploadFile(token, file, empresa) {
     }
 
     const result = await response.json();
-    console.log("Archivo subido con éxito:", result);
 
     return result;
   } catch (error) {
@@ -476,9 +471,7 @@ export async function uploadFile(token, file, empresa) {
 }
 export async function traerPDF(token, id) {
   try {
-    console.log(
-      `${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, "%2F")}?alt=media`
-    );
+
     const response = await fetch(
       `${PDF_URL}tgroup_recibos/o/${id.replace(/\//g, "%2F")}?alt=media`,
       {
@@ -513,13 +506,7 @@ export async function getRecibos(id, empresa, firmados, page) {
         )}&sqlOrderBy=PERIODO ASC&page=${page}`,
         config
       );
-      console.log(
-        "recibo",
-        resp.data,
-        `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(
-          empresa
-        )}&sqlOrderBy=PERIODO ASC&page=${page}`
-      );
+
       return { status: 200, datos: resp.data };
     } catch (error) {
       console.error(error);
@@ -568,9 +555,7 @@ export async function LbRegistroClase(pagina, parametros, endpoint, empresa) {
       sqlString = sqlString.slice(0, -5); // remove the last ' AND '
       // URL encode the entire SQL filter string to ensure special characters are correctly interpreted
       const encodedSqlString = encodeURIComponent(sqlString);
-      console.log(
-        `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`
-      );
+
       const resp = await axios.get(
         `${URL}${endpoint}?page=${pagina}&cliente=${empresa}&sqlFilter=${encodedSqlString}`,
         config
@@ -617,7 +602,6 @@ export const updateRecibo = async (
   if (disconformidad !== "") {
     data.MOTIVO_DISCONFORMIDAD = disconformidad;
   }
-  console.log(url, data);
   try {
     const response = await axios.put(url, data, config);
     return response.status;
@@ -672,7 +656,6 @@ export const updateCorreo = async (id, empresa) => {
     EMAIL_VERIFICADO: true,
   };
 
-  console.log(url, data);
   try {
     const response = await axios.put(url, data, config);
     return response.status;
@@ -714,7 +697,6 @@ export const postLog = async (
     FK_WS_USUARIOS,
   };
 
-  console.log(url, data);
   try {
     const response = await axios.post(url, data, config);
     return response.status;

@@ -77,7 +77,6 @@ const [adjuntoObligatorio, setAdjuntoObligatorio] = useState(false);
       };
     });
 
-    console.log(newPhotos);
     setPhotos((prev) => [...prev, ...newPhotos]);
   };
 
@@ -156,7 +155,6 @@ const [adjuntoObligatorio, setAdjuntoObligatorio] = useState(false);
           "Hubo un error al enviar el formulario. Por favor, inténtelo de nuevo."
         );
       }
-      console.log(formData);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -343,7 +341,6 @@ Archivos: {adjuntoObligatorio && (
                           .filter(Boolean) as Photo[];
 
                         setPhotos((prev) => [...prev, ...newPhotos]);
-                        console.log(newPhotos, photos);
                       }}
                     />
                   </div>

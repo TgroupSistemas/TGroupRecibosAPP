@@ -89,7 +89,6 @@ export const AppContextProvider = ({ children }) => {
         );
         setResponseLogin(data);
         postLogRecibo(data.datos.FK_WS_CLIENTES, "L", "", data.datos.ID);
-        console.log(data);
         document.cookie =
           "isloggedin=" + (await setCookie("true")) + "; max-age=28800; path=/";
         document.cookie = `id=${await setCookie(
@@ -158,7 +157,6 @@ export const AppContextProvider = ({ children }) => {
 
         return 200;
       } else {
-        console.log("ERRORRR user mal", data);
         return data.status;
       }
     } catch (error) {
@@ -269,11 +267,8 @@ export const AppContextProvider = ({ children }) => {
         setMailVerificadoCambio(true);
         setCorreoLoading(false);
       } else {
-        console.log("ERRORRR correo");
       }
     } catch (error) {
-      console.error(error);
-      console.log("HOLAAAAA");
 
       setCorreoLoading(false);
       correoError("Error al actualizar el correo");
@@ -298,14 +293,12 @@ export const AppContextProvider = ({ children }) => {
     };
     try {
       const data = await mailUsuario(dni);
-      console.log(data, "ASDA");
       if (data.status == 200) {
         const data2 = await cambioPassword(
           nuevaContraseña,
           data.datos.ID,
           data.empresa
         );
-        console.log(data2, "ASDA");
         if (data2.status == 200) {
           const response = await fetch("/api/sendEmail2", {
             method: "POST",
@@ -327,7 +320,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -344,7 +336,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -367,7 +358,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -388,7 +378,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -417,7 +406,6 @@ export const AppContextProvider = ({ children }) => {
         ...dataPage1,
         datos: [...(dataPage1.datos || []), ...(dataPage2.datos || [])],
       };
-      console.log(combinedData, "ASDA");
       const data = combinedData;
       if (data.status == 200) {
         setLoadingLicencias(false);
@@ -426,7 +414,6 @@ export const AppContextProvider = ({ children }) => {
         return false;
       }
     } catch (error) {
-      console.log("ERRORRR user mal", error);
       return false;
     }
   }, []);
@@ -442,7 +429,6 @@ export const AppContextProvider = ({ children }) => {
         )}; max-age=28800; path=/`;
         setTycCambio(true);
       } else {
-        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -464,7 +450,6 @@ export const AppContextProvider = ({ children }) => {
         document.cookie = `vdp=${await setCookie(ver)}; max-age=28800; path=/`;
         setVdpCambio(true);
       } else {
-        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -488,7 +473,6 @@ export const AppContextProvider = ({ children }) => {
         )}; max-age=28800; path=/`;
         setHasPassw(true);
       } else {
-        console.log("ERRORRR cambio password");
       }
     } catch (error) {
       console.error(error);
@@ -525,11 +509,9 @@ export const AppContextProvider = ({ children }) => {
       const data = await getRecibos(id, empresa, false, 1);
 
       if (data.status == 200) {
-        console.log("algo", data.datos);
         setRecibosSinFirmarLoading(false);
         setRecibosSinFirmar(data.datos);
       } else {
-        console.log("ERRORRR recibos");
       }
     } catch (error) {
       console.error(error);
@@ -558,8 +540,6 @@ const getRecibosFirmados = useCallback(
         if (items.length === 0) break;
 
         toAppend.push(...items);
-        console.log("Fetched page", page, "with", items.length, "items");
-        console.log("Fetched items:", toAppend);
         if (items.length < 20) break; // last page
         page += 1;
       }
@@ -606,9 +586,7 @@ const getRecibosFirmados = useCallback(
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
-          console.log(data);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -626,7 +604,6 @@ const getRecibosFirmados = useCallback(
         );
         if (data == 200) {
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -644,9 +621,7 @@ const getRecibosFirmados = useCallback(
 
         if (data == 200) {
           setRecibosFirmaLoading(false);
-          console.log(data);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -662,7 +637,6 @@ const getRecibosFirmados = useCallback(
       const data = await uploadFile(token.datos[0].GCS_TOKEN, archivo, await getCookie("fl_erp_empresas"));
       const titulo = descrip + "|" + data.name + "|";
       setImagenLoading(false);
-      console.log("a", data, titulo);
       return { titulo, status: 200 };
     } catch (error) {
       return 300;
@@ -688,9 +662,7 @@ const getRecibosFirmados = useCallback(
         );
         if (data == 200) {
           setLogLoading(false);
-          console.log(data);
         } else {
-          console.log("ERRORRR recibos");
         }
       } catch (error) {
         console.error(error);
@@ -717,7 +689,6 @@ const getRecibosFirmados = useCallback(
     const FK_WS_CLIENTES = await getCookie("fl_erp_empresas");
 
     try {
-      console.log(licenciaData);
       const operacion = licenciaData.tipoLicencia === "U" ? "A" : "L";
       const data = await postLicencia({
         FK_WS_USUARIOS,
@@ -732,15 +703,11 @@ const getRecibosFirmados = useCallback(
         ARCHIVOS: licenciaData.ARCHIVOS,
         ESTADO_ERP: 'P'
       });
-      console.log(data);
       if (data.status == 200) {
         setLicenciaLoading(false);
         return 200;
-        console.log(data);
       } else {
-        console.log("ke");
         return 300;
-        console.log("ERRORRR recibos");
       }
     } catch (error) {
       return 300;
@@ -769,14 +736,11 @@ const getRecibosFirmados = useCallback(
 
             setClaseLoading(false);
           } else {
-            console.log("ERRORRR getRegistroUnico");
           }
         })
         .catch(function (error) {
-          console.log(error);
         });
     } catch (error) {
-      console.log("ERRORRR getRegistroUnico");
     }
   }, []);
 

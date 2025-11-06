@@ -23,7 +23,6 @@ export default function Navbar() {
       setName(username);
       const numberofNotis2 = await traerNumeroNotisNoLeidas();
       setNumberofNotis(numberofNotis2);
-      console.log("a", await getCookie("fl_erp_empresas"))
       setUpdateVisible(await getCookie("fl_erp_empresas") == "TGROUP" || await getCookie("fl_erp_empresas") == "ITBROKERS"); 
     };
     fetchname();

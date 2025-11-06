@@ -217,10 +217,11 @@ export default function Home() {
 
             {(mailVerificado != "true" ||
               tycState != "true" ||
+              hasPassw == false ||
               (verificaDatos != "F" && verificaDatos != "X")) &&
               !mailLoading && (
                 <MailPassword
-                  hasPass={hasPass}
+                  hasPass={hasPassw}
                   mail={mail}
                   mailv={mailVerificado}
                   tyc={tycState}

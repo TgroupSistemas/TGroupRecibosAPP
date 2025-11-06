@@ -13,13 +13,22 @@ interface mailProps {
   vdp: string;
 }
 export default function MailPassword(props: mailProps) {
-  console.log("ASDA", props.vdp);
-  const [step, setStep] = useState(() => {
+  const [step, setStep] = useState<number>(() => {
     if (props.tyc === "true") {
-      return (props.vdp !== "F" && props.vdp !== "F" ) ? 4 : 0;
-    } else {
-      return 3;
+      if (props.vdp !== "F" && props.vdp !== "X") {
+        return 4;
+      } else {
+        if (props.mailv !== "true") {
+          return 0;
+        } else {
+          if (props.hasPass !== true) {
+            return 2;
+          }
+          return 0;
+        }
+      }
     }
+    return 0;
   });
 
   const [email, setEmail] = useState("");
@@ -124,7 +133,6 @@ export default function MailPassword(props: mailProps) {
 
   useEffect(() => {
     const fetchData = async () => {
-      console.log("Step:", step);
       if (step === 4) {
         setLoading(true);
         const username = await getCookie("username");
@@ -168,7 +176,6 @@ export default function MailPassword(props: mailProps) {
       100000 + Math.random() * 900000
     ).toString(); // Generar código de 6 dígitos
     addVerificationCodeToCookie(verificationCode);
-    console.log(correo, verificationCode);
     await sendVerificationEmail(correo, verificationCode);
   };
 
@@ -199,6 +206,7 @@ export default function MailPassword(props: mailProps) {
       }
       if (props.mailv != "true") {
         setStep(0);
+
       }
 
       
@@ -209,7 +217,6 @@ export default function MailPassword(props: mailProps) {
     }
     if (step === 1) {
       const cookiesArray = getCookieAsArray("cod");
-      console.log(cookiesArray, verificationCode);
       if (!cookiesArray.includes(verificationCode)) {
         setError("Código de verificación incorrecto");
         return;
@@ -230,7 +237,6 @@ export default function MailPassword(props: mailProps) {
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
-    console.log(password, confirmPassword);
     e.preventDefault();
     if (password !== confirmPassword) {
       setError("Las contraseñas no coinciden");

@@ -66,7 +66,6 @@ export default function Perfil() {
 
   const username = await getCookie("username");
   const data = await traerDatosPerfil(username);
-  console.log("Fetched user data:", data); // Log the fetched data
   setUserData(data);  
   setLoading(false);
 };

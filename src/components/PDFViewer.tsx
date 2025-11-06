@@ -45,7 +45,6 @@ const PDFViewer: React.FC<PDFProps> = ({ id }) => {
     return () => {
       if (PDF) {
         URL.revokeObjectURL(PDF);
-        console.log;
       }
     };
   }, []);

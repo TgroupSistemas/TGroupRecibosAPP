@@ -37,7 +37,6 @@ export default function Home() {
       dni, // Make sure to use the state variables here
       password,
     });
-    console.log("Response:", response);
 
     if (response == 201 || response == 401) {
       setLoading(false);
