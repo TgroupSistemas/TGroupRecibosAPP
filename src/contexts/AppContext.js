@@ -207,7 +207,6 @@ export const AppContextProvider = ({ children }) => {
   const getEmpresasHab2 = useCallback(async () => {
     try {
       const empresasHabilitadas = await getCookie("empresasHabilitadas");
-      console.log("empresasHabilitadas:", empresasHabilitadas);
       if (empresasHabilitadas == null) {
         return [];
       }
@@ -216,7 +215,6 @@ export const AppContextProvider = ({ children }) => {
         empresasHabilitadas,
         await getCookie("fl_erp_empresas")
       );
-      console.log("traerEmpresas result:", result);
 
       // Map through empresasHabilitadas and add the corresponding DESCRIPCION
       const combinedArray = result.datos.map((item1) => {

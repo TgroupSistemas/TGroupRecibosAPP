@@ -400,7 +400,6 @@ export async function traerEmpresas(filtro, empresa) {
     `${URL}/clases/WS_CLIENTES?cliente=tgroup${sqlFilter}`,
     config
   );
-  console.log("TraerEmpresas - URL:", `${URL}/clases/WS_CLIENTES?cliente=tgroup${sqlFilter}`, "Response Data:", resp.data);
   return { status: 200, datos: resp.data };
 }
 
@@ -504,7 +503,7 @@ export async function getRecibos(id, empresa, firmados, page) {
       const resp = await axios.get(
         `${URL}/clases/WS_RECIBOS?sqlFilter=${sqlFilter}&cliente=${encodeURIComponent(
           empresa
-        )}&sqlOrderBy=PERIODO ASC&page=${page}`,
+        )}&sqlOrderBy=PERIODO DESC&page=${page}`,
         config
       );
 
