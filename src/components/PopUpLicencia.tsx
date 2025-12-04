@@ -95,7 +95,10 @@ const PopUpLicencia: React.FC<PopUpLicProps> = ({
     return "Desconocido";
 }
   })();
-
+function formatDate(dateString : string): string {
+  const [year, month, day] = dateString.split("T")[0].split("-");
+  return `${day}/${month}/${year}`;
+}
   const sameDay =
     new Date(noti.FEC_DES).toLocaleDateString() ===
     new Date(noti.FEC_HAS).toLocaleDateString();
@@ -115,11 +118,11 @@ const PopUpLicencia: React.FC<PopUpLicProps> = ({
         <h1 className={`text-lg font-bold mb-5 ${estadoMeta[estado].text}`}>
           {tipoLicencia}
           <br />
-          {sameDay
-            ? new Date(noti.FEC_DES).toLocaleDateString()
-            : `${new Date(noti.FEC_DES).toLocaleDateString()} - ${new Date(
-                noti.FEC_HAS
-              ).toLocaleDateString()}`}
+{
+  sameDay
+    ? formatDate(noti.FEC_DES)
+    : `${formatDate(noti.FEC_DES)} - ${formatDate(noti.FEC_HAS)}`
+}
           <div className="mt-1">
             <span
               className={`inline-block mt-2 px-3 py-1 rounded-full text-sm font-semibold ${estadoMeta[estado].bg} ${estadoMeta[estado].text} border ${estadoMeta[estado].border}`}

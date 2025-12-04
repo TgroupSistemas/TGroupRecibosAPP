@@ -64,7 +64,10 @@ const LicenciaCard: React.FC<NotificationCardProps> = ({
       sideBg: "bg-red-600",
     },
   };
-
+function formatDate(dateString : string): string {
+  const [year, month, day] = dateString.split("T")[0].split("-");
+  return `${day}/${month}/${year}`;
+}
   const sameDay =
     new Date(notificacion.FEC_DES).toLocaleDateString() ===
     new Date(notificacion.FEC_HAS).toLocaleDateString();
@@ -136,13 +139,11 @@ switch (notificacion.TIPO_LIC) {
 
           <div className="mt-1 flex md:items-center gap-2 flex-col md:flex-row">
             <p className="text-gray-400">
-              {sameDay
-                ? new Date(notificacion.FEC_DES).toLocaleDateString()
-                : `${new Date(
-                    notificacion.FEC_DES
-                  ).toLocaleDateString()} - ${new Date(
-                    notificacion.FEC_HAS
-                  ).toLocaleDateString()}`}
+{
+  sameDay
+    ? formatDate(notificacion.FEC_DES)
+    : `${formatDate(notificacion.FEC_DES)} - ${formatDate(notificacion.FEC_HAS)}`
+}
             </p>
 
             {/* Estado badge */}
