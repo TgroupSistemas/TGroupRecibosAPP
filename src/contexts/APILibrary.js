@@ -679,6 +679,11 @@ async function getIP() {
   }
 }
 
+const normalizarCliente = (cliente) => {
+  if (!cliente) return "";
+  return cliente.split("/")[0].trim();
+};
+
 export const postLog = async (
   FK_WS_CLIENTES,
   OPERACION,
@@ -686,15 +691,18 @@ export const postLog = async (
   FK_WS_USUARIOS,
   FECHA_HORA
 ) => {
-  const url = `${URL}/clases/WS_RECIBOS_LOG?cliente=${FK_WS_CLIENTES}`;
+  const clienteNormalizado = normalizarCliente(FK_WS_CLIENTES);
+  const url = `${URL}/clases/WS_RECIBOS_LOG?cliente=${encodeURIComponent(clienteNormalizado)}`;
   const IP = await getIP();
+
   const data = {
-    FK_WS_CLIENTES,
+    FK_WS_CLIENTES: clienteNormalizado,
     IP,
     OPERACION,
     FK_WS_RECIBOS,
     FECHA_HORA,
     FK_WS_USUARIOS,
+    cliente: clienteNormalizado,
   };
 
   try {
