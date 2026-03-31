@@ -31,9 +31,12 @@ interface Photo {
   id: string; // Unique identifier for the photo
   file: File; // The actual file object
   description: string; // A description of the photo
-  type?: "image" | "pdf"; // The type of the file
+type?: "image" | "pdf" | "file";
 }
-
+const EXTENSIONES_PERMITIDAS = [
+  "doc", "docx", "xls", "xlsx", "pdf", "txt",
+  "zip", "rar", "jpg", "jpeg", "png", "gif", "bmp", "7z"
+];
 const Home = () => {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [fechaDesde, setFechaDesde] = useState("");
@@ -308,41 +311,69 @@ Archivos: {adjuntoObligatorio && (
                     <input
                       type="file"
                       id="photo-upload"
-                      accept="image/*,application/pdf"
+                      accept=".doc,.docx,.xls,.xlsx,.pdf,.txt,.zip,.rar,.jpg,.jpeg,.png,.gif,.bmp,.7z"
                       multiple
                       className="hidden"
-                      onChange={(e) => {
-                        const files = e.target.files;
-                        if (!files) return;
+onChange={(e) => {
+  const files = e.target.files;
+  if (!files) return;
 
-                        const newPhotos: Photo[] = Array.from(files)
-                          .map((file) => {
-                            setError("");
-                            if (file.size > 2 * 1024 * 1024) {
-                              setError("El archivo no debe superar los 2MB");
-                              return null;
-                            }
+  setError("");
 
-                            const newFileName = `${Date.now()}-${Math.floor(
-                              Math.random() * 10000
-                            )}.${file.name.split(".").pop()}`;
-                            const renamedFile = new File([file], newFileName, {
-                              type: file.type,
-                            });
+  const EXTENSIONES_PERMITIDAS = [
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "pdf",
+    "txt",
+    "zip",
+    "rar",
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "bmp",
+    "7z",
+  ];
 
-                            return {
-                              id: URL.createObjectURL(renamedFile),
-                              file: renamedFile,
-                              description: "",
-                              type: renamedFile.type.startsWith("image")
-                                ? "image"
-                                : "pdf",
-                            };
-                          })
-                          .filter(Boolean) as Photo[];
+  const newPhotos: Photo[] = Array.from(files)
+    .map((file) => {
+      const extension = file.name.split(".").pop()?.toLowerCase();
 
-                        setPhotos((prev) => [...prev, ...newPhotos]);
-                      }}
+      if (!extension || !EXTENSIONES_PERMITIDAS.includes(extension)) {
+        setError(`Formato no permitido: ${file.name}`);
+        return null;
+      }
+
+      if (file.size > 2 * 1024 * 1024) {
+        setError(`El archivo ${file.name} no debe superar los 2MB`);
+        return null;
+      }
+
+      const newFileName = `${Date.now()}-${Math.floor(
+        Math.random() * 10000
+      )}.${extension}`;
+
+      const renamedFile = new File([file], newFileName, {
+        type: file.type,
+      });
+
+      return {
+        id: URL.createObjectURL(renamedFile),
+        file: renamedFile,
+        description: "",
+        type: renamedFile.type.startsWith("image")
+          ? "image"
+          : renamedFile.type === "application/pdf"
+          ? "pdf"
+          : "file",
+      };
+    })
+    .filter(Boolean) as Photo[];
+
+  setPhotos((prev) => [...prev, ...newPhotos]);
+}}
                     />
                   </div>
                 </div>
