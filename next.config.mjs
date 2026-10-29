@@ -9,6 +9,8 @@ const nextConfig = {
           test: /\.node/,
           use: "raw-loader",
         });
+        // canvas es opcional para pdfjs y no se instala en Node nuevo
+        config.resolve.alias.canvas = false;
         return config;
   },
 };
