@@ -167,21 +167,19 @@ export async function postLicencia(datosFormularioActual) {
 export async function mailUsuario(dni) {
   let sqlFilter = `USERNAME = '${dni}'`;
   let respuestaAPI;
-  const empresas = ["TGROUP", "CRONI", "ITBROKERS"];
-  for (const empresa of empresas) {
-    try {
-      const resp = await axios.get(
-        `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter} &cliente=${empresa}&sqlAttributes=EMAIL,ID`,
-        config
-      );
-      let datos = resp.data;
-      if (datos.length > 0) {
-        respuestaAPI = 200;
-        return { status: respuestaAPI, datos: datos[0], empresa }; 
-      }
-    } catch (error) {
-      console.error(error);
+  // Sin cliente, igual que logeo: busca en todas las empresas y la toma del usuario
+  try {
+    const resp = await axios.get(
+      `${URL}/clases/WS_USUARIOS?sqlFilter=${sqlFilter}&sqlAttributes=EMAIL,ID,FK_WS_CLIENTES`,
+      config
+    );
+    let datos = resp.data;
+    if (datos.length > 0) {
+      respuestaAPI = 200;
+      return { status: respuestaAPI, datos: datos[0], empresa: datos[0].FK_WS_CLIENTES };
     }
+  } catch (error) {
+    console.error(error);
   }
   return { status: 201 };
 }
